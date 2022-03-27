@@ -1,0 +1,245 @@
+<html>
+<head>
+    <title>Video experiment</title>
+
+    <!--Loading the jsPsych Library-->
+    <script src="jspsych/jspsych.js"></script>
+    <!--Loading plugin for showing video stimuli-->
+    <!--This plugin is edited, mainly for support of video looping combined with answer lock-->
+    <script src="jspsych/plugin-edited-video-keyboard-response.js"></script>
+    <!--Loading plugin for end of the trial-->
+    <script src="jspsych/plugin-html-button-response.js"> </script>
+    <!--Loading plugin for start of the trial-->
+    <script src="jspsych/plugin-html-keyboard-response.js"> </script>
+    <!--Loading plugin for preloading the videos-->
+    <script src="jspsych/plugin-preload.js"> </script>
+    <!--Loading stylesheet-->
+    <link href="jspsych/jspsych.css" rel="stylesheet" type="text/css" />
+    
+</head>
+
+<!--Stimuli question is always displayed on top of the page-->
+<body>
+    
+    <h2>Which of the botom two materials appears most similar to the one on the top?</h2>
+    <div id="jspsych-target"></div>
+</body>
+
+
+<script>
+/*Initializing jsPsych*/
+/*For JATOS onFinish needs to modified to send data to JATOS*/
+/*Specifies, that data will be shown at the end of the experiment*/
+var jsPsych = initJsPsych(
+    {
+        display_element: 'jspsych-target',
+        on_finish: function() {
+            jsPsych.data.displayData();
+        }
+    }
+
+);
+
+/*Creating experiment timeline*/
+var timeline = [];
+
+/*Automatic preload of videos*/
+/*Later preload can be set manually to preload smaller portions of videos (trial videos, experiment videos)*/
+var preload_trial = {
+    type: jsPsychPreload,
+    auto_preload: true
+}
+
+/*Instructions showed before the trial*/
+var start_of_the_trial = {
+    type: jsPsychHtmlKeyboardResponse,
+    timeline: [
+        {stimulus: `<h2 class="h2Uvod">INSTRUCTIONS:</h2>
+            <br>
+            <p class="pUvodDva">In the following experiment you will be presented with a series of
+                    trials.  Each trial consists of three movies, showing different surfaces
+                    rotating.  Your task is to indicate which of the bottom two materials
+                    appears most similar to the one on the top.</p>
+            <p class="pUvodDva">The movies are about 4 seconds long and play on loop.</p>
+            <p class="pUvodDva">You won't be able to respond until you have seen the whole movie play through at least once.</p>
+            <p class="pUvodDva">To indicate that the bottom <span class="left">LEFT</span> material looks most similar to the top material, <span class="left">PRESS THE "A" KEY.</span></p>
+            <p class="pUvodDva">To indicate that the bottom <span class="right">RIGHT</span> material looks most similar to the top material, <span class="right">PRESS THE "L" KEY.</span></p>
+            <p class="pContinue">PRESS ANY KEY TO CONTINUE</p>`},
+        {stimulus: `<h2 class="h2Uvod">INSTRUCTIONS:</h2>
+            <br>
+            <p class="pUvodDva">You should base you judgment on the overall appearance of the materials,
+                    and choose whichever of the two options looks most similar in your
+                    opinion.  There is no option to say that they look equally similar, you
+                    have to make a decision. At the same time, don't 'overthink' your
+                    response: we are interested in your perceptual impression of the
+                    surfaces, not your logical reasoning abilities.</p>
+            <br>
+            <p class="pUvodDva">On a subset of trials, you will be shown sets of materials for which
+                    there is a correct answer.  If you fail to get these ones correct, we
+                    may penalise your reward for taking part.
+                    These <span class="right">'catch trials'</span> appear at random and are not indicated, so please pay attention and respond 
+                    carefully on every trial.</p>
+            <p class="pContinue">PRESS ANY KEY TO CONTINUE</p>`},
+        {stimulus: `<h2 class="h2Uvod">INSTRUCTIONS:</h2>
+            <br>
+            <p class="pUvodDva">Before the experiment begins, there are <span class="left">three practice trials</span> so you can
+                    get used to responding and also so you can form an impression of the
+                    range of appearances you are likely to encounter</p>
+            <p class="pContinue">PRESS ANY KEY TO CONTINUE</p>`}
+    ],
+    choices: "ALL_KEYS",
+    post_trial_gap: 500
+};
+timeline.push(start_of_the_trial);
+
+
+/*Informing participant about start of practice trials*/
+var info = {
+    type:jsPsychHtmlKeyboardResponse,
+    stimulus: '<p class="pInfoText">Start of practice trials</p>',
+    choices: "NO_KEYS",
+    trial_duration: 2000
+};
+timeline.push(info);
+
+/*Practice trials*/
+var practice_trial = {
+    type: jsPsychVideoKeyboardResponse,
+    prompt: '<p class="pHelpKey" >[A] for left, [L] for right</p>',
+    choices:['a', 'l'],
+    margin_vertical: '30px',
+    margin_horizontal: '20px',
+    autoplay: true,
+    response_allowed_while_playing: false,
+    loop: true,
+    timeline: [
+        {stimulus: ['demo/leather01_leather02_leather05.mp4']},
+        {stimulus: ['demo/leather01_leather02_leather05.mp4']},
+        {stimulus: ['demo/leather01_leather02_leather05.mp4']}
+    ],
+    post_trial_gap: 1000
+};
+timeline.push(practice_trial);
+
+/*Informing participant about start of actual experiment*/
+var info = {
+    type:jsPsychHtmlKeyboardResponse,
+    stimulus: '<p class="pInfoText">Start of experiment trials</p>',
+    choices: "NO_KEYS",
+    trial_duration: 3000
+};
+timeline.push(info);
+
+
+/*List of videos for normal trials*/
+var answer = [['demo/leather01_leather02_leather05.mp4']
+             ,['demo/leather01_leather02_leather05.mp4']
+             ,['demo/leather01_leather02_leather05.mp4']
+             ,['demo/leather01_leather02_leather05.mp4']]
+
+/*Randomizing the order*/
+var yes = [];
+var it_yes = 0;
+
+for (var i = 0; i < answer.length; i++) {
+    yes.push(i);
+}
+yes = jsPsych.randomization.repeat(yes, 1, false);
+
+/*List of videos for catch trials*/
+var no_answer = [['demo/leather01_leather02_leather05.mp4']
+                ,['demo/leather01_leather02_leather05.mp4']]
+
+/*Randomizing the order*/
+var no = [];
+var it_no = 0;
+
+for (var i = 0; i < no_answer.length; i++) {
+    no.push(i);
+}
+no = jsPsych.randomization.repeat(no, 1, false);
+
+/*Normal trial*/
+var yes_answer_trial = {
+    type: jsPsychVideoKeyboardResponse,
+    prompt: `<p class="pHelpKey" >[A] for left, [L] for right</p>
+             <p class="pHelpKey"> Normal trial (beta)</p>`,
+    choices:['a', 'l'],
+    margin_vertical: '30px',
+    margin_horizontal: '20px',
+    autoplay: true,
+    response_allowed_while_playing: false,
+    loop: true,
+    /*Dummy value for initialization of the trial*/
+    stimulus: answer[0],
+    post_trial_gap: 1000,
+    /*Before start takes next number from yes array (parmutation of normal videos positions) and makes stimuli the corresponding video*/
+    on_start: function(trial){
+        trial.stimulus = answer[yes[it_yes]];
+        /*Displaying which video was selected*/
+        trial.prompt += '<p class="pHelpKey">Video '+ (yes[it_yes]+1) + '</p>'
+        it_yes++;
+        
+    }
+}
+
+/*Catch trial*/
+var no_answer_trial = {
+    type: jsPsychVideoKeyboardResponse,
+    prompt: `<p  class="pHelpKey" >[A] for left, [L] for right</p>
+             <p class="pHelpKey"> Catch trial (beta) </p>`,
+    choices:['a', 'l'],
+    margin_vertical: '30px',
+    margin_horizontal: '20px',
+    autoplay: true,
+    response_allowed_while_playing: false,
+    loop: true,
+    /*Dummy value for initialization of the trial*/
+    stimulus: no_answer[0],
+    post_trial_gap: 1000,
+    /*Before start takes next number from no array (parmutation of catch videos positions) and makes stimuli the corresponding video*/
+    on_start: function(trial){
+        trial.stimulus = no_answer[no[it_no]];
+        /*Displaying which video was selected*/
+        trial.prompt += '<p class="pHelpKey">Video '+ (no[it_no]+1) + '</p>'
+        it_no++;
+    }
+}
+
+
+var trials = [no_answer_trial, yes_answer_trial]
+
+/*Adding specific number of each type of trial - according to the number of videos in the list*/
+var trialsToRandomize = [];
+for (var i = 0; i < answer.length; i++) {
+    trialsToRandomize.push(yes_answer_trial);
+}
+for (var i = 0; i < no_answer.length; i++) {
+    trialsToRandomize.push(no_answer_trial);
+}
+
+/*Randomization of the trial order*/
+trialsToRandomize = jsPsych.randomization.repeat(trialsToRandomize, 1, false);
+
+/*Procedure for testing part of the experiment*/
+var experiment_procedure = {
+    timeline: trialsToRandomize
+}
+
+timeline.push(experiment_procedure);
+
+/*Informing participant about the end of the study*/
+var end_of_the_trial = {
+    type: jsPsychHtmlButtonResponse,
+    stimulus: `<p class="pInfoText">Thank for taking part in our experiment!</p>
+                <br>
+                <br>`,
+    choices: ['View raw data (beta)']
+};
+timeline.push(end_of_the_trial);
+
+
+jsPsych.run(timeline);
+</script>
+
+</html>

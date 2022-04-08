@@ -1,0 +1,1113 @@
+[
+  {
+    "rt": 1516,
+    "stimulus": "<br>\n                    <br>\n                    <br>\n                    <p class=\"pInfoText\">Visual fingerprint of material appearance experiment</p>\n                    <p class=\"pUvodNo\">Principal Investigator:   Ing. Jiří Filip, Ph.D, ÚTIA AV ČR v.v.i.,</p>\n                    <p class=\"pUvodNo\">filipj@utia.cas.cz, tel: +420 266 052 365</p>\n                    <br>",
+    "response": 0,
+    "trial_type": "html-button-response",
+    "trial_index": 0,
+    "time_elapsed": 1518,
+    "internal_node_id": "0.0-0.0"
+  },
+  {
+    "rt": 3717,
+    "response": {
+      "consent": "on"
+    },
+    "trial_type": "survey-html-form",
+    "trial_index": 1,
+    "time_elapsed": 5237,
+    "internal_node_id": "0.0-1.0"
+  },
+  {
+    "rt": 13990,
+    "response": {
+      "gender": "male",
+      "age": "22",
+      "noPersonal": "on",
+      "postFileName": ""
+    },
+    "trial_type": "survey-html-form",
+    "trial_index": 2,
+    "time_elapsed": 19230,
+    "internal_node_id": "0.0-2.0"
+  },
+  {
+    "view_history": [
+      {
+        "page_index": 0,
+        "viewing_time": 1398
+      },
+      {
+        "page_index": 1,
+        "viewing_time": 1160
+      },
+      {
+        "page_index": 2,
+        "viewing_time": 927
+      },
+      {
+        "page_index": 3,
+        "viewing_time": 753
+      },
+      {
+        "page_index": 4,
+        "viewing_time": 577
+      }
+    ],
+    "rt": 4815,
+    "trial_type": "instructions",
+    "trial_index": 3,
+    "time_elapsed": 24045,
+    "internal_node_id": "0.0-3.0"
+  },
+  {
+    "rt": null,
+    "stimulus": "<p class=\"pInfoText\">Start of practice trials</p>",
+    "response": null,
+    "trial_type": "html-keyboard-response",
+    "trial_index": 4,
+    "time_elapsed": 26557,
+    "internal_node_id": "0.0-4.0"
+  },
+  {
+    "rt": 91,
+    "stimulus": [
+      "demo/practice/031_032_033.mp4"
+    ],
+    "response": "a",
+    "trial_type": "video-keyboard-response",
+    "trial_index": 5,
+    "time_elapsed": 28742,
+    "internal_node_id": "0.0-5.0-0.0"
+  },
+  {
+    "rt": 20693,
+    "stimulus": [
+      "demo/practice/034_035_036.mp4"
+    ],
+    "response": "a",
+    "trial_type": "video-keyboard-response",
+    "trial_index": 6,
+    "time_elapsed": 52535,
+    "internal_node_id": "0.0-5.0-1.0"
+  },
+  {
+    "rt": 3642,
+    "stimulus": [
+      "demo/practice/037_038_039.mp4"
+    ],
+    "response": "l",
+    "trial_type": "video-keyboard-response",
+    "trial_index": 7,
+    "time_elapsed": 59263,
+    "internal_node_id": "0.0-5.0-2.0"
+  },
+  {
+    "rt": null,
+    "stimulus": "<p class=\"pInfoText\">Start of experiment trials</p>",
+    "response": null,
+    "trial_type": "html-keyboard-response",
+    "trial_index": 8,
+    "time_elapsed": 63292,
+    "internal_node_id": "0.0-6.0"
+  },
+  {
+    "rt": 3642,
+    "stimulus": [
+      "demo/practice/037_038_039.mp4"
+    ],
+    "response": "l",
+    "trial_type": "video-keyboard-response",
+    "trial_index": 9,
+    "time_elapsed": 71542,
+    "internal_node_id": "0.0-7.0"
+  },
+  {
+    "rt": 1943,
+    "stimulus": [
+      "demo/test/029_019_024.mp4"
+    ],
+    "response": "a",
+    "trial_type": "video-keyboard-response",
+    "trial_index": 10,
+    "time_elapsed": 76574,
+    "internal_node_id": "0.0-8.0"
+  },
+  {
+    "rt": 4615,
+    "stimulus": [
+      "demo/test/010_004_007.mp4"
+    ],
+    "response": "l",
+    "trial_type": "video-keyboard-response",
+    "trial_index": 11,
+    "time_elapsed": 84285,
+    "internal_node_id": "0.0-9.0"
+  },
+  {
+    "rt": 4615,
+    "stimulus": [
+      "demo/test/010_004_007.mp4"
+    ],
+    "response": "l",
+    "trial_type": "video-keyboard-response",
+    "trial_index": 12,
+    "time_elapsed": 89304,
+    "internal_node_id": "0.0-10.0"
+  },
+  {
+    "rt": 497,
+    "stimulus": [
+      "demo/test/012_001_007.mp4"
+    ],
+    "response": "l",
+    "trial_type": "video-keyboard-response",
+    "trial_index": 13,
+    "time_elapsed": 92880,
+    "internal_node_id": "0.0-11.0"
+  },
+  {
+    "rt": 21714,
+    "stimulus": [
+      "demo/test/027_015_024.mp4"
+    ],
+    "response": "a",
+    "trial_type": "video-keyboard-response",
+    "trial_index": 14,
+    "time_elapsed": 117669,
+    "internal_node_id": "0.0-12.0"
+  },
+  {
+    "rt": 4838,
+    "stimulus": [
+      "demo/catch/004_004_029.mp4"
+    ],
+    "response": "l",
+    "trial_type": "video-keyboard-response",
+    "trial_index": 15,
+    "time_elapsed": 125581,
+    "internal_node_id": "0.0-13.0"
+  },
+  {
+    "rt": 11947,
+    "stimulus": [
+      "demo/test/007_003_027.mp4"
+    ],
+    "response": "a",
+    "trial_type": "video-keyboard-response",
+    "trial_index": 16,
+    "time_elapsed": 140607,
+    "internal_node_id": "0.0-14.0"
+  },
+  {
+    "rt": 15043,
+    "stimulus": [
+      "demo/test/022_009_021.mp4"
+    ],
+    "response": "l",
+    "trial_type": "video-keyboard-response",
+    "trial_index": 17,
+    "time_elapsed": 158734,
+    "internal_node_id": "0.0-15.0"
+  },
+  {
+    "rt": 2174,
+    "stimulus": [
+      "demo/test/007_019_021.mp4"
+    ],
+    "response": "a",
+    "trial_type": "video-keyboard-response",
+    "trial_index": 18,
+    "time_elapsed": 163991,
+    "internal_node_id": "0.0-16.0"
+  },
+  {
+    "rt": 501,
+    "stimulus": [
+      "demo/test/018_019_024.mp4"
+    ],
+    "response": "l",
+    "trial_type": "video-keyboard-response",
+    "trial_index": 19,
+    "time_elapsed": 167575,
+    "internal_node_id": "0.0-17.0"
+  },
+  {
+    "rt": 2717,
+    "stimulus": [
+      "demo/test/018_013_022.mp4"
+    ],
+    "response": "a",
+    "trial_type": "video-keyboard-response",
+    "trial_index": 20,
+    "time_elapsed": 173382,
+    "internal_node_id": "0.0-18.0"
+  },
+  {
+    "rt": 2717,
+    "stimulus": [
+      "demo/test/018_013_022.mp4"
+    ],
+    "response": "a",
+    "trial_type": "video-keyboard-response",
+    "trial_index": 21,
+    "time_elapsed": 180587,
+    "internal_node_id": "0.0-19.0"
+  },
+  {
+    "rt": 4330,
+    "stimulus": [
+      "demo/test/002_022_028.mp4"
+    ],
+    "response": "l",
+    "trial_type": "video-keyboard-response",
+    "trial_index": 22,
+    "time_elapsed": 185549,
+    "internal_node_id": "0.0-20.0"
+  },
+  {
+    "rt": 9328,
+    "stimulus": [
+      "demo/test/007_014_030.mp4"
+    ],
+    "response": "a",
+    "trial_type": "video-keyboard-response",
+    "trial_index": 23,
+    "time_elapsed": 197951,
+    "internal_node_id": "0.0-21.0"
+  },
+  {
+    "rt": 9328,
+    "stimulus": [
+      "demo/test/007_014_030.mp4"
+    ],
+    "response": "a",
+    "trial_type": "video-keyboard-response",
+    "trial_index": 24,
+    "time_elapsed": 201429,
+    "internal_node_id": "0.0-22.0"
+  },
+  {
+    "rt": 2717,
+    "stimulus": [
+      "demo/test/018_013_022.mp4"
+    ],
+    "response": "a",
+    "trial_type": "video-keyboard-response",
+    "trial_index": 25,
+    "time_elapsed": 204582,
+    "internal_node_id": "0.0-23.0"
+  },
+  {
+    "rt": 28328,
+    "stimulus": [
+      "demo/test/020_001_022.mp4"
+    ],
+    "response": "l",
+    "trial_type": "video-keyboard-response",
+    "trial_index": 26,
+    "time_elapsed": 236013,
+    "internal_node_id": "0.0-24.0"
+  },
+  {
+    "rt": 28328,
+    "stimulus": [
+      "demo/test/020_001_022.mp4"
+    ],
+    "response": "l",
+    "trial_type": "video-keyboard-response",
+    "trial_index": 27,
+    "time_elapsed": 240662,
+    "internal_node_id": "0.0-25.0"
+  },
+  {
+    "rt": 2717,
+    "stimulus": [
+      "demo/test/018_013_022.mp4"
+    ],
+    "response": "a",
+    "trial_type": "video-keyboard-response",
+    "trial_index": 28,
+    "time_elapsed": 261862,
+    "internal_node_id": "0.0-26.0"
+  },
+  {
+    "rt": 2717,
+    "stimulus": [
+      "demo/test/018_013_022.mp4"
+    ],
+    "response": "a",
+    "trial_type": "video-keyboard-response",
+    "trial_index": 29,
+    "time_elapsed": 276958,
+    "internal_node_id": "0.0-27.0"
+  },
+  {
+    "rt": 7134,
+    "stimulus": [
+      "demo/test/008_023_028.mp4"
+    ],
+    "response": "l",
+    "trial_type": "video-keyboard-response",
+    "trial_index": 30,
+    "time_elapsed": 287182,
+    "internal_node_id": "0.0-28.0"
+  },
+  {
+    "rt": 3822,
+    "stimulus": [
+      "demo/test/012_021_023.mp4"
+    ],
+    "response": "l",
+    "trial_type": "video-keyboard-response",
+    "trial_index": 31,
+    "time_elapsed": 294087,
+    "internal_node_id": "0.0-29.0"
+  },
+  {
+    "rt": 3822,
+    "stimulus": [
+      "demo/test/012_021_023.mp4"
+    ],
+    "response": "l",
+    "trial_type": "video-keyboard-response",
+    "trial_index": 32,
+    "time_elapsed": 319015,
+    "internal_node_id": "0.0-30.0"
+  },
+  {
+    "rt": 2717,
+    "stimulus": [
+      "demo/test/018_013_022.mp4"
+    ],
+    "response": "a",
+    "trial_type": "video-keyboard-response",
+    "trial_index": 33,
+    "time_elapsed": 355286,
+    "internal_node_id": "0.0-31.0"
+  },
+  {
+    "rt": 14246,
+    "stimulus": [
+      "demo/test/027_003_022.mp4"
+    ],
+    "response": "l",
+    "trial_type": "video-keyboard-response",
+    "trial_index": 34,
+    "time_elapsed": 369839,
+    "internal_node_id": "0.0-32.0"
+  },
+  {
+    "rt": 2717,
+    "stimulus": [
+      "demo/test/018_013_022.mp4"
+    ],
+    "response": "a",
+    "trial_type": "video-keyboard-response",
+    "trial_index": 35,
+    "time_elapsed": 384632,
+    "internal_node_id": "0.0-33.0"
+  },
+  {
+    "rt": 2717,
+    "stimulus": [
+      "demo/test/018_013_022.mp4"
+    ],
+    "response": "a",
+    "trial_type": "video-keyboard-response",
+    "trial_index": 36,
+    "time_elapsed": 446535,
+    "internal_node_id": "0.0-34.0"
+  },
+  {
+    "rt": 2717,
+    "stimulus": [
+      "demo/test/018_013_022.mp4"
+    ],
+    "response": "a",
+    "trial_type": "video-keyboard-response",
+    "trial_index": 37,
+    "time_elapsed": 488054,
+    "internal_node_id": "0.0-35.0"
+  },
+  {
+    "rt": 2717,
+    "stimulus": [
+      "demo/test/018_013_022.mp4"
+    ],
+    "response": "a",
+    "trial_type": "video-keyboard-response",
+    "trial_index": 38,
+    "time_elapsed": 522792,
+    "internal_node_id": "0.0-36.0"
+  },
+  {
+    "rt": 2717,
+    "stimulus": [
+      "demo/test/018_013_022.mp4"
+    ],
+    "response": "a",
+    "trial_type": "video-keyboard-response",
+    "trial_index": 39,
+    "time_elapsed": 574806,
+    "internal_node_id": "0.0-37.0"
+  },
+  {
+    "rt": 1857,
+    "stimulus": [
+      "demo/test/004_019_029.mp4"
+    ],
+    "response": "a",
+    "trial_type": "video-keyboard-response",
+    "trial_index": 40,
+    "time_elapsed": 579758,
+    "internal_node_id": "0.0-38.0"
+  },
+  {
+    "rt": 18016,
+    "stimulus": [
+      "demo/test/005_018_030.mp4"
+    ],
+    "response": "a",
+    "trial_type": "video-keyboard-response",
+    "trial_index": 41,
+    "time_elapsed": 600862,
+    "internal_node_id": "0.0-39.0"
+  },
+  {
+    "rt": 18016,
+    "stimulus": [
+      "demo/test/005_018_030.mp4"
+    ],
+    "response": "a",
+    "trial_type": "video-keyboard-response",
+    "trial_index": 42,
+    "time_elapsed": 780023,
+    "internal_node_id": "0.0-40.0"
+  },
+  {
+    "rt": 2717,
+    "stimulus": [
+      "demo/test/018_013_022.mp4"
+    ],
+    "response": "a",
+    "trial_type": "video-keyboard-response",
+    "trial_index": 43,
+    "time_elapsed": 806287,
+    "internal_node_id": "0.0-41.0"
+  },
+  {
+    "rt": 152521,
+    "stimulus": [
+      "demo/test/026_009_024.mp4"
+    ],
+    "response": "a",
+    "trial_type": "video-keyboard-response",
+    "trial_index": 44,
+    "time_elapsed": 959523,
+    "internal_node_id": "0.0-42.0"
+  },
+  {
+    "rt": 1183,
+    "stimulus": [
+      "demo/test/006_005_027.mp4"
+    ],
+    "response": "l",
+    "trial_type": "video-keyboard-response",
+    "trial_index": 45,
+    "time_elapsed": 963807,
+    "internal_node_id": "0.0-43.0"
+  },
+  {
+    "rt": 1539,
+    "stimulus": [
+      "demo/test/001_012_026.mp4"
+    ],
+    "response": "a",
+    "trial_type": "video-keyboard-response",
+    "trial_index": 46,
+    "time_elapsed": 968439,
+    "internal_node_id": "0.0-44.0"
+  },
+  {
+    "rt": 3602,
+    "stimulus": [
+      "demo/test/021_004_023.mp4"
+    ],
+    "response": "l",
+    "trial_type": "video-keyboard-response",
+    "trial_index": 47,
+    "time_elapsed": 975143,
+    "internal_node_id": "0.0-45.0"
+  },
+  {
+    "rt": 3602,
+    "stimulus": [
+      "demo/test/021_004_023.mp4"
+    ],
+    "response": "l",
+    "trial_type": "video-keyboard-response",
+    "trial_index": 48,
+    "time_elapsed": 982480,
+    "internal_node_id": "0.0-46.0"
+  },
+  {
+    "rt": 2717,
+    "stimulus": [
+      "demo/test/018_013_022.mp4"
+    ],
+    "response": "a",
+    "trial_type": "video-keyboard-response",
+    "trial_index": 49,
+    "time_elapsed": 1029823,
+    "internal_node_id": "0.0-47.0"
+  },
+  {
+    "rt": 2717,
+    "stimulus": [
+      "demo/test/018_013_022.mp4"
+    ],
+    "response": "a",
+    "trial_type": "video-keyboard-response",
+    "trial_index": 50,
+    "time_elapsed": 1034606,
+    "internal_node_id": "0.0-48.0"
+  },
+  {
+    "rt": 2717,
+    "stimulus": [
+      "demo/test/018_013_022.mp4"
+    ],
+    "response": "a",
+    "trial_type": "video-keyboard-response",
+    "trial_index": 51,
+    "time_elapsed": 1044975,
+    "internal_node_id": "0.0-49.0"
+  },
+  {
+    "rt": 2717,
+    "stimulus": [
+      "demo/test/018_013_022.mp4"
+    ],
+    "response": "a",
+    "trial_type": "video-keyboard-response",
+    "trial_index": 52,
+    "time_elapsed": 1074177,
+    "internal_node_id": "0.0-50.0"
+  },
+  {
+    "rt": 37424,
+    "stimulus": [
+      "demo/test/014_006_009.mp4"
+    ],
+    "response": "l",
+    "trial_type": "video-keyboard-response",
+    "trial_index": 53,
+    "time_elapsed": 1114695,
+    "internal_node_id": "0.0-51.0"
+  },
+  {
+    "rt": 37424,
+    "stimulus": [
+      "demo/test/014_006_009.mp4"
+    ],
+    "response": "l",
+    "trial_type": "video-keyboard-response",
+    "trial_index": 54,
+    "time_elapsed": 1118486,
+    "internal_node_id": "0.0-52.0"
+  },
+  {
+    "rt": 230,
+    "stimulus": [
+      "demo/test/017_009_015.mp4"
+    ],
+    "response": "l",
+    "trial_type": "video-keyboard-response",
+    "trial_index": 55,
+    "time_elapsed": 1121806,
+    "internal_node_id": "0.0-53.0"
+  },
+  {
+    "rt": 2717,
+    "stimulus": [
+      "demo/test/018_013_022.mp4"
+    ],
+    "response": "a",
+    "trial_type": "video-keyboard-response",
+    "trial_index": 56,
+    "time_elapsed": 1124345,
+    "internal_node_id": "0.0-54.0"
+  },
+  {
+    "rt": 2159,
+    "stimulus": [
+      "demo/test/007_010_018.mp4"
+    ],
+    "response": "l",
+    "trial_type": "video-keyboard-response",
+    "trial_index": 57,
+    "time_elapsed": 1127054,
+    "internal_node_id": "0.0-55.0"
+  },
+  {
+    "rt": 3419,
+    "stimulus": [
+      "demo/test/019_016_026.mp4"
+    ],
+    "response": "l",
+    "trial_type": "video-keyboard-response",
+    "trial_index": 58,
+    "time_elapsed": 1130855,
+    "internal_node_id": "0.0-56.0"
+  },
+  {
+    "rt": 2717,
+    "stimulus": [
+      "demo/test/018_013_022.mp4"
+    ],
+    "response": "a",
+    "trial_type": "video-keyboard-response",
+    "trial_index": 59,
+    "time_elapsed": 1134646,
+    "internal_node_id": "0.0-57.0"
+  },
+  {
+    "rt": 2717,
+    "stimulus": [
+      "demo/test/018_013_022.mp4"
+    ],
+    "response": "a",
+    "trial_type": "video-keyboard-response",
+    "trial_index": 60,
+    "time_elapsed": 1159998,
+    "internal_node_id": "0.0-58.0"
+  },
+  {
+    "rt": 2717,
+    "stimulus": [
+      "demo/test/018_013_022.mp4"
+    ],
+    "response": "a",
+    "trial_type": "video-keyboard-response",
+    "trial_index": 61,
+    "time_elapsed": 1166911,
+    "internal_node_id": "0.0-59.0"
+  },
+  {
+    "rt": 9692,
+    "stimulus": [
+      "demo/test/027_010_025.mp4"
+    ],
+    "response": "l",
+    "trial_type": "video-keyboard-response",
+    "trial_index": 62,
+    "time_elapsed": 1177535,
+    "internal_node_id": "0.0-60.0"
+  },
+  {
+    "rt": 7324,
+    "stimulus": [
+      "demo/test/020_011_016.mp4"
+    ],
+    "response": "l",
+    "trial_type": "video-keyboard-response",
+    "trial_index": 63,
+    "time_elapsed": 1186847,
+    "internal_node_id": "0.0-61.0"
+  },
+  {
+    "rt": 2717,
+    "stimulus": [
+      "demo/test/018_013_022.mp4"
+    ],
+    "response": "a",
+    "trial_type": "video-keyboard-response",
+    "trial_index": 64,
+    "time_elapsed": 1234737,
+    "internal_node_id": "0.0-62.0"
+  },
+  {
+    "rt": 2717,
+    "stimulus": [
+      "demo/test/018_013_022.mp4"
+    ],
+    "response": "a",
+    "trial_type": "video-keyboard-response",
+    "trial_index": 65,
+    "time_elapsed": 1250624,
+    "internal_node_id": "0.0-63.0"
+  },
+  {
+    "rt": 2717,
+    "stimulus": [
+      "demo/test/018_013_022.mp4"
+    ],
+    "response": "a",
+    "trial_type": "video-keyboard-response",
+    "trial_index": 66,
+    "time_elapsed": 1260039,
+    "internal_node_id": "0.0-64.0"
+  },
+  {
+    "rt": 2717,
+    "stimulus": [
+      "demo/test/018_013_022.mp4"
+    ],
+    "response": "a",
+    "trial_type": "video-keyboard-response",
+    "trial_index": 67,
+    "time_elapsed": 1266151,
+    "internal_node_id": "0.0-65.0"
+  },
+  {
+    "rt": 2717,
+    "stimulus": [
+      "demo/test/018_013_022.mp4"
+    ],
+    "response": "a",
+    "trial_type": "video-keyboard-response",
+    "trial_index": 68,
+    "time_elapsed": 1285648,
+    "internal_node_id": "0.0-66.0"
+  },
+  {
+    "rt": 13,
+    "stimulus": [
+      "demo/test/012_010_021.mp4"
+    ],
+    "response": "l",
+    "trial_type": "video-keyboard-response",
+    "trial_index": 69,
+    "time_elapsed": 1288735,
+    "internal_node_id": "0.0-67.0"
+  },
+  {
+    "rt": 2717,
+    "stimulus": [
+      "demo/test/018_013_022.mp4"
+    ],
+    "response": "a",
+    "trial_type": "video-keyboard-response",
+    "trial_index": 70,
+    "time_elapsed": 1293502,
+    "internal_node_id": "0.0-68.0"
+  },
+  {
+    "rt": 2717,
+    "stimulus": [
+      "demo/test/018_013_022.mp4"
+    ],
+    "response": "a",
+    "trial_type": "video-keyboard-response",
+    "trial_index": 71,
+    "time_elapsed": 1298148,
+    "internal_node_id": "0.0-69.0"
+  },
+  {
+    "rt": 2717,
+    "stimulus": [
+      "demo/test/018_013_022.mp4"
+    ],
+    "response": "a",
+    "trial_type": "video-keyboard-response",
+    "trial_index": 72,
+    "time_elapsed": 1301017,
+    "internal_node_id": "0.0-70.0"
+  },
+  {
+    "rt": 2465,
+    "stimulus": [
+      "demo/test/017_007_020.mp4"
+    ],
+    "response": "l",
+    "trial_type": "video-keyboard-response",
+    "trial_index": 73,
+    "time_elapsed": 1303711,
+    "internal_node_id": "0.0-71.0"
+  },
+  {
+    "rt": 3350,
+    "stimulus": [
+      "demo/test/002_004_005.mp4"
+    ],
+    "response": "l",
+    "trial_type": "video-keyboard-response",
+    "trial_index": 74,
+    "time_elapsed": 1307464,
+    "internal_node_id": "0.0-72.0"
+  },
+  {
+    "rt": 2717,
+    "stimulus": [
+      "demo/test/018_013_022.mp4"
+    ],
+    "response": "a",
+    "trial_type": "video-keyboard-response",
+    "trial_index": 75,
+    "time_elapsed": 1310937,
+    "internal_node_id": "0.0-73.0"
+  },
+  {
+    "rt": 797,
+    "stimulus": [
+      "demo/test/024_004_010.mp4"
+    ],
+    "response": "l",
+    "trial_type": "video-keyboard-response",
+    "trial_index": 76,
+    "time_elapsed": 1314831,
+    "internal_node_id": "0.0-74.0"
+  },
+  {
+    "rt": 23274,
+    "stimulus": [
+      "demo/test/023_015_025.mp4"
+    ],
+    "response": "l",
+    "trial_type": "video-keyboard-response",
+    "trial_index": 77,
+    "time_elapsed": 1341199,
+    "internal_node_id": "0.0-75.0"
+  },
+  {
+    "rt": 23274,
+    "stimulus": [
+      "demo/test/023_015_025.mp4"
+    ],
+    "response": "l",
+    "trial_type": "video-keyboard-response",
+    "trial_index": 78,
+    "time_elapsed": 1353706,
+    "internal_node_id": "0.0-76.0"
+  },
+  {
+    "rt": 9264,
+    "stimulus": [
+      "demo/test/026_011_018.mp4"
+    ],
+    "response": "l",
+    "trial_type": "video-keyboard-response",
+    "trial_index": 79,
+    "time_elapsed": 1363088,
+    "internal_node_id": "0.0-77.0"
+  },
+  {
+    "rt": 2769,
+    "stimulus": [
+      "demo/test/030_010_029.mp4"
+    ],
+    "response": "l",
+    "trial_type": "video-keyboard-response",
+    "trial_index": 80,
+    "time_elapsed": 1368959,
+    "internal_node_id": "0.0-78.0"
+  },
+  {
+    "rt": 2769,
+    "stimulus": [
+      "demo/test/030_010_029.mp4"
+    ],
+    "response": "l",
+    "trial_type": "video-keyboard-response",
+    "trial_index": 81,
+    "time_elapsed": 1446855,
+    "internal_node_id": "0.0-79.0"
+  },
+  {
+    "rt": 13185,
+    "stimulus": [
+      "demo/test/013_014_015.mp4"
+    ],
+    "response": "l",
+    "trial_type": "video-keyboard-response",
+    "trial_index": 82,
+    "time_elapsed": 1461872,
+    "internal_node_id": "0.0-80.0"
+  },
+  {
+    "rt": 2717,
+    "stimulus": [
+      "demo/test/018_013_022.mp4"
+    ],
+    "response": "a",
+    "trial_type": "video-keyboard-response",
+    "trial_index": 83,
+    "time_elapsed": 1465440,
+    "internal_node_id": "0.0-81.0"
+  },
+  {
+    "rt": 2717,
+    "stimulus": [
+      "demo/test/018_013_022.mp4"
+    ],
+    "response": "a",
+    "trial_type": "video-keyboard-response",
+    "trial_index": 84,
+    "time_elapsed": 1470752,
+    "internal_node_id": "0.0-82.0"
+  },
+  {
+    "rt": 2717,
+    "stimulus": [
+      "demo/test/018_013_022.mp4"
+    ],
+    "response": "a",
+    "trial_type": "video-keyboard-response",
+    "trial_index": 85,
+    "time_elapsed": 1588704,
+    "internal_node_id": "0.0-83.0"
+  },
+  {
+    "rt": 26253,
+    "stimulus": [
+      "demo/test/015_012_021.mp4"
+    ],
+    "response": "l",
+    "trial_type": "video-keyboard-response",
+    "trial_index": 86,
+    "time_elapsed": 1615209,
+    "internal_node_id": "0.0-84.0"
+  },
+  {
+    "rt": 3912,
+    "stimulus": [
+      "demo/test/028_005_025.mp4"
+    ],
+    "response": "l",
+    "trial_type": "video-keyboard-response",
+    "trial_index": 87,
+    "time_elapsed": 1619712,
+    "internal_node_id": "0.0-85.0"
+  },
+  {
+    "rt": 2717,
+    "stimulus": [
+      "demo/test/018_013_022.mp4"
+    ],
+    "response": "a",
+    "trial_type": "video-keyboard-response",
+    "trial_index": 88,
+    "time_elapsed": 1638959,
+    "internal_node_id": "0.0-86.0"
+  },
+  {
+    "rt": 2717,
+    "stimulus": [
+      "demo/test/018_013_022.mp4"
+    ],
+    "response": "a",
+    "trial_type": "video-keyboard-response",
+    "trial_index": 89,
+    "time_elapsed": 1733845,
+    "internal_node_id": "0.0-87.0"
+  },
+  {
+    "rt": 8790,
+    "stimulus": [
+      "demo/test/008_023_024.mp4"
+    ],
+    "response": "l",
+    "trial_type": "video-keyboard-response",
+    "trial_index": 90,
+    "time_elapsed": 1745727,
+    "internal_node_id": "0.0-88.0"
+  },
+  {
+    "rt": 8790,
+    "stimulus": [
+      "demo/test/008_023_024.mp4"
+    ],
+    "response": "l",
+    "trial_type": "video-keyboard-response",
+    "trial_index": 91,
+    "time_elapsed": 1748664,
+    "internal_node_id": "0.0-89.0"
+  },
+  {
+    "rt": 7741,
+    "stimulus": [
+      "demo/test/019_012_022.mp4"
+    ],
+    "response": "l",
+    "trial_type": "video-keyboard-response",
+    "trial_index": 92,
+    "time_elapsed": 1756554,
+    "internal_node_id": "0.0-90.0"
+  },
+  {
+    "rt": 7183,
+    "stimulus": [
+      "demo/test/026_004_017.mp4"
+    ],
+    "response": "l",
+    "trial_type": "video-keyboard-response",
+    "trial_index": 93,
+    "time_elapsed": 1763753,
+    "internal_node_id": "0.0-91.0"
+  },
+  {
+    "rt": 7108,
+    "stimulus": [
+      "demo/test/009_011_014.mp4"
+    ],
+    "response": "l",
+    "trial_type": "video-keyboard-response",
+    "trial_index": 94,
+    "time_elapsed": 1771483,
+    "internal_node_id": "0.0-92.0"
+  },
+  {
+    "rt": 12726,
+    "stimulus": [
+      "demo/test/006_013_026.mp4"
+    ],
+    "response": "l",
+    "trial_type": "video-keyboard-response",
+    "trial_index": 95,
+    "time_elapsed": 1784279,
+    "internal_node_id": "0.0-93.0"
+  },
+  {
+    "rt": 2717,
+    "stimulus": [
+      "demo/test/018_013_022.mp4"
+    ],
+    "response": "a",
+    "trial_type": "video-keyboard-response",
+    "trial_index": 96,
+    "time_elapsed": 1795010,
+    "internal_node_id": "0.0-94.0"
+  },
+  {
+    "rt": 2717,
+    "stimulus": [
+      "demo/test/018_013_022.mp4"
+    ],
+    "response": "a",
+    "trial_type": "video-keyboard-response",
+    "trial_index": 97,
+    "time_elapsed": 1799881,
+    "internal_node_id": "0.0-95.0"
+  },
+  {
+    "rt": 2717,
+    "stimulus": [
+      "demo/test/018_013_022.mp4"
+    ],
+    "response": "a",
+    "trial_type": "video-keyboard-response",
+    "trial_index": 98,
+    "time_elapsed": 1802160,
+    "internal_node_id": "0.0-96.0"
+  },
+  {
+    "rt": 7323,
+    "stimulus": "<p class=\"pInfoText\">Thank you for taking part in our experiment!</p>\n                    <br>\n                    <br>",
+    "response": 0,
+    "trial_type": "html-button-response",
+    "trial_index": 99,
+    "time_elapsed": 1810495,
+    "internal_node_id": "0.0-97.0"
+  }
+]

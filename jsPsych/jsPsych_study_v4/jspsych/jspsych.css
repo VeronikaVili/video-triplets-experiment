@@ -1,0 +1,368 @@
+/*
+ * CSS for jsPsych experiments.
+ *
+ * This stylesheet provides minimal styling to make jsPsych
+ * experiments look polished without any additional styles.
+ */
+
+@import url(https://fonts.googleapis.com/css?family=Open+Sans:400italic,700italic,400,700);
+
+/* Container holding jsPsych content */
+
+.jspsych-display-element {
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+
+.jspsych-display-element:focus {
+  outline: none;
+}
+
+.jspsych-content-wrapper {
+  display: flex;
+  margin: auto;
+  flex: 1 1 100%;
+  width: 100%; 
+}
+
+.jspsych-content {
+  max-width: 95%; /* this is mainly an IE 10-11 fix */
+  text-align: center;
+  margin: auto; /* this is for overflowing content */
+}
+
+.jspsych-top {
+  align-items: flex-start;
+}
+
+.jspsych-middle {
+  align-items: center;
+}
+
+/* fonts and type */
+
+.jspsych-display-element {
+  font-family: "Open Sans", "Arial", sans-serif;
+  font-size: 18px;
+  line-height: 1.6em;
+}
+
+/* Form elements like input fields and buttons */
+
+.jspsych-display-element input[type="text"] {
+  font-family: "Open Sans", "Arial", sans-serif;
+  font-size: 14px;
+}
+
+/* borrowing Bootstrap style for btn elements, but combining styles a bit */
+.jspsych-btn {
+  display: inline-block;
+  padding: 12px 12px;
+  margin: 0px;
+  font-size: 15px;
+  font-weight: 400;
+  font-family: "Open Sans", "Arial", sans-serif;
+  cursor: pointer;
+  line-height: 1.4;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: middle;
+  background-image: none;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  color: #fff;
+  background-color: #2b2b2b;
+  border-color: #636363;
+}
+
+.jspsych-btn-video {
+  display: inline-block;
+  padding: 13px 75px;
+  margin: 0px 100px;
+  font-size: 30px;
+  font-weight: 700;
+  font-family: "Open Sans", "Arial", sans-serif;
+  cursor: pointer;
+  line-height: 1.4;
+  text-align: center;
+  white-space: nowrap;
+  vertical-align: middle;
+  background-image: none;
+  border: 1px solid transparent;
+  border-radius: 4px;
+  color: #707070;
+  background-color: #262626;
+  border-color: #636363;
+}
+
+/* only apply the hover style on devices with a mouse/pointer that can hover - issue #977 */
+@media (hover: hover) {
+  .jspsych-btn:hover {
+    background-color: #171717;
+    border-color: #636363;
+  }
+}
+
+@media (hover: hover) {
+  .jspsych-btn-video:hover {
+    background-color: #171717;
+    border-color: #636363;
+  }
+}
+
+.jspsych-btn:active {
+  background-color: #333;
+  border-color: #000000;
+}
+
+.jspsych-btn-video:active {
+  background-color: #333;
+  border-color: #000000;
+}
+
+.jspsych-btn:disabled {
+  background-color: #171717;
+  color: #333;
+  border-color: #636363;
+  cursor: not-allowed;
+}
+.jspsych-btn-video:disabled {
+  background-color: #171717;
+  color: #333;
+  border-color: #636363;
+  cursor: not-allowed;
+}
+
+/* custom style for input[type="range] (slider) to improve alignment between positions and labels */
+
+.jspsych-slider {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  width: 100%;
+  background: transparent;
+}
+.jspsych-slider:focus {
+  outline: none;
+}
+/* track */
+.jspsych-slider::-webkit-slider-runnable-track {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 100%;
+  height: 8px;
+  cursor: pointer;
+  background: #eee;
+  box-shadow: 0px 0px 0px #000000, 0px 0px 0px #0d0d0d;
+  border-radius: 2px;
+  border: 1px solid #aaa;
+}
+.jspsych-slider::-moz-range-track {
+  appearance: none;
+  width: 100%;
+  height: 8px;
+  cursor: pointer;
+  background: #eee;
+  box-shadow: 0px 0px 0px #000000, 0px 0px 0px #0d0d0d;
+  border-radius: 2px;
+  border: 1px solid #aaa;
+}
+.jspsych-slider::-ms-track {
+  appearance: none;
+  width: 99%;
+  height: 14px;
+  cursor: pointer;
+  background: #eee;
+  box-shadow: 0px 0px 0px #000000, 0px 0px 0px #0d0d0d;
+  border-radius: 2px;
+  border: 1px solid #aaa;
+}
+/* thumb */
+.jspsych-slider::-webkit-slider-thumb {
+  border: 1px solid #666;
+  height: 24px;
+  width: 15px;
+  border-radius: 5px;
+  background: #ffffff;
+  cursor: pointer;
+  -webkit-appearance: none;
+  margin-top: -9px;
+}
+.jspsych-slider::-moz-range-thumb {
+  border: 1px solid #666;
+  height: 24px;
+  width: 15px;
+  border-radius: 5px;
+  background: #ffffff;
+  cursor: pointer;
+}
+.jspsych-slider::-ms-thumb {
+  border: 1px solid #666;
+  height: 20px;
+  width: 15px;
+  border-radius: 5px;
+  background: #ffffff;
+  cursor: pointer;
+  margin-top: -2px;
+}
+
+/* jsPsych progress bar */
+
+#jspsych-progressbar-container {
+  color: #707070;
+  /*border-bottom: 1px solid #636363;*/
+  background-color: #000000;
+  margin-bottom: 1em;
+  text-align: center;
+  padding: 8px 0px;
+  width: 100%;
+  line-height: 1em;
+}
+#jspsych-progressbar-container span {
+  font-size: 14px;
+  padding-right: 14px;
+}
+#jspsych-progressbar-outer {
+  background-color: rgb(36, 36, 36);
+  width: 50%;
+  margin: auto;
+  height: 14px;
+  display: inline-block;
+  vertical-align: middle;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+#jspsych-progressbar-inner {
+  background-color: #326e52;
+  width: 0%;
+  height: 100%;
+}
+
+/* Control appearance of jsPsych.data.displayData() */
+#jspsych-data-display {
+  text-align: left;
+  font-size: 10px;
+  line-height: 1.6em;
+  text-overflow: ellipsis;
+}
+
+
+/*My own css styles*/
+
+h2 {
+  font-family: "Open Sans", "Arial", sans-serif;
+  font-size: 25px;
+  line-height: 1.6em;
+  text-align: center;
+  margin-top: 2%;
+}
+
+p {
+  font-family: "Open Sans", "Arial", sans-serif;
+  font-size: 15px;
+  line-height: 1.6em;
+  text-align: center;
+  
+}
+
+.h2Top {
+  font-family: "Open Sans", "Arial", sans-serif;
+  font-size: 25px;
+  line-height: 1.6em;
+  text-align: center;
+  margin-top: 2%;
+  color: #707070;
+
+}
+
+.h2Uvod {
+  font-family: "Open Sans", "Arial", sans-serif;
+  font-size: 20px;
+  line-height: 1.6em;
+  text-align: center;
+  margin-left: 20%;
+  margin-right: 20%;
+}
+
+.h2UvodNo {
+  font-family: "Open Sans", "Arial", sans-serif;
+  font-size: 20px;
+  line-height: 1.6em;
+  text-align: center;
+}
+
+.pUvod {
+  font-family: "Open Sans", "Arial", sans-serif;
+  font-size: 17px;
+  line-height: 1.6em;
+  text-align: left;
+  margin-left: 20%;
+  margin-right: 20%;
+}
+
+.pUvodNo {
+  font-family: "Open Sans", "Arial", sans-serif;
+  font-size: 17px;
+  line-height: 1.6em;
+  text-align: center;
+}
+
+.pUvodDva {
+  font-family: "Open Sans", "Arial", sans-serif;
+  font-size: 20px;
+  line-height: 1.6em;
+  text-align: left;
+  margin-left: 20%;
+  margin-right: 20%;
+}
+
+.pUvodImage {
+  font-family: "Open Sans", "Arial", sans-serif;
+  font-size: 20px;
+  line-height: 1.6em;
+  text-align: center;
+}
+
+.pInfoText {
+  font-family: "Open Sans", "Arial", sans-serif;
+  font-size: 40px;
+  line-height: 1.6em;
+  text-align: center;
+}
+
+.pContinue {
+  font-family: "Open Sans", "Arial", sans-serif;
+  font-size: 20px;
+  line-height: 1.6em;
+  text-align: center;
+  color: #555;
+}
+
+.left {
+  color: #baeb9d;
+}
+
+.right {
+  color: #ebb49d;
+}
+
+.pHelpKey {
+  color: #555;
+}
+
+.pHelpKeyQuestion {
+  color: #555;
+  font-size: 17px;
+}
+
+video {
+  /*It's importatnt to specify only width otherwise the controls of the video won't be aligned with it*/
+  max-width: 100%;
+  width: 100%;
+}
+
+html {
+  background-color: #000000;
+  color: #fff;
+}
+

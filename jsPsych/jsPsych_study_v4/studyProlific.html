@@ -69,13 +69,7 @@
     var SECOND_CATCH_TRIAL = 2;
     var THIRD_CATCH_TRIAL = 4;
 
-    /*Automatic preload of videos*/
-    /*Later preload can be set manually to preload smaller portions of videos (trial videos, experiment videos)*/
-    var preload_trial = {
-        type: jsPsychPreload,
-        auto_preload: true
-    }
-
+    
     // Initialization for filling computed date
     var date = new Date();
     var year = date.getFullYear();
@@ -151,30 +145,16 @@
     }
     timeline.push(agreenmentTwo);
 
-    // Filling in personal info
-    var personal_info_fill = {
-        type: jsPsychSurveyHtmlForm,
-        html: `<br>
-                <h2 class="h2Uvod">Select your gender:</h2>
-               <div class="pUvodDva"> 
-                    <input type ="radio" id="male" name="gender" value="male"><label for="male">Male</label>
-               </div>
-               <div class="pUvodDva"> 
-                    <input type ="radio" id="female" name="gender" value="female"><label for="female">Female</label>
-               </div>
-               <br>
-               <h2 class="h2Uvod">Fill in your age:</h2>
-               <div class="h2Uvod">
-                    <input type="number" id="age" name="age">
-               </div>
-               <br>
-               <p class="pUvodNo">If you don't want to input any personal information, check the box below:</p>
-               <input type="checkbox" id="noPersonal" name="noPersonal"><label for="noPersonal">   I don't want to fill any personal infromation</label>
-               <br>
-               <br>
-               <input type="hidden" id="postfileName" name="postFileName" value="">`
+    var instructionImages = ['demo/instructions1.png', 'demo/instructions2.png'];
+
+    /*Automatic preload of videos*/
+    var preload_trial = {
+        type: jsPsychPreload,
+        images: instructionImages,
+        show_progress_bar: false
     }
-    timeline.push(personal_info_fill);
+    timeline.push(preload_trial);
+
 
     /*Instructions showed before the trial*/
     var start_of_the_trial = {
@@ -186,15 +166,15 @@
                     trials.  Each trial consists of three movies, showing different surfaces
                     rotating.  Your task is to indicate which of the bottom two materials
                     appears most similar to the one on the top.</p>
-            <img src="demo/topBottom.png"></img>
+            <img src="demo/instructions1.png"></img>
             <p class="pHelpKey">Illustration image</p>
             <p class="pUvodDva">The movies are about 4 seconds long and play on loop. Please watch the movie carefully before responding.</p>`,
             
             `<h2 class="h2Uvod">INSTRUCTIONS:</h2>
-            <img src="demo/leftRight.png"></img>
             <p class="pHelpKey">Illustration image</p>
-            <p class="pUvodImage">To indicate that the bottom <span class="left">LEFT</span> material looks most similar to the top material, <span class="left">PRESS THE "LEFT" BUTTON.</span></p>
-            <p class="pUvodImage">To indicate that the bottom <span class="right">RIGHT</span> material looks most similar to the top material, <span class="right">PRESS THE "RIGHT" BUTTON.</span></p>`,
+            <img src="demo/instructions2.png"></img>
+            <br>
+            <br>`,
             
             `<h2 class="h2Uvod">INSTRUCTIONS:</h2>
             <br>
@@ -238,12 +218,23 @@
     };
     timeline.push(info);
 
+    var practiceVideoPreload = ['demo/practice/031_032_033.mp4', 'demo/practice/034_035_036.mp4', 'demo/practice/037_038_039.mp4'];
+
+    /*Automatic preload of videos*/
+    var preload_trial_prac = {
+        type: jsPsychPreload,
+        video: practiceVideoPreload,
+        show_progress_bar: false
+    }
+    timeline.push(preload_trial_prac);
+
+
     /*Practice trials*/
     var practice_trial = {
         type: jsPsychVideoButtonResponse,
         //prompt: `<pre class="pHelpKey">Press [A]                                Press [L]</pre>`,
         prompt: '<p class="pHelpKeyQuestion">Which of the bottom two materials appears most similar to the one on the top?</p>',
-        choices:['LEFT ', 'RIGHT'],
+        choices:['LEFT', 'RIGHT'],
         margin_vertical: '30px',
         margin_horizontal: '20px',
         autoplay: true,
@@ -311,23 +302,41 @@
                     ['demo/catch/011_011_007.mp4'],
                     ['demo/catch/030_015_030.mp4']];
     var catch_number = 0;
+    var catch_array_preload = ['demo/catch/004_004_029.mp4','demo/catch/011_011_007.mp4', 'demo/catch/030_015_030.mp4'];
+
+    /*Automatic preload of videos*/
+    var preload_trial_catch = {
+        type: jsPsychPreload,
+        video: catch_array_preload,
+        show_progress_bar: false
+    }
+    timeline.push(preload_trial_catch);
 
     /// Adding test trials
     // Catch trials are inserted at given time represented by constants X_CATCH_TRIAL defined up at the start
     // Later will be divided into individual components in JATOS
     for (var r = 0; r < stimulus_array.length; r++) {
+        var preload_exp = stimulus_array[r]
+        /*Automatic preload of videos*/
+        var preload_trial_test = {
+            type: jsPsychPreload,
+            video: preload_exp,
+            show_progress_bar: false
+        }
+        timeline.push(preload_trial_test);
+
         var test_trial = {
             type: jsPsychVideoButtonResponse,
             //prompt: `<pre class="pHelpKey">Press [A]                                Press [L]</pre>`,
             prompt: '<p class="pHelpKeyQuestion">Which of the bottom two materials appears most similar to the one on the top?</p>',
-            choices:['LEFT ', 'RIGHT'],
+            choices:['LEFT  ', 'RIGHT'],
             stimulus: stimulus_array[r],
             margin_vertical: '30px',
             margin_horizontal: '20px',
             autoplay: true,
             response_allowed_while_playing: true,
             loop: true,
-            post_trial_gap: 1000
+            post_trial_gap: 1200
         }
         timeline.push(test_trial);
         if (r == FIRST_CATCH_TRIAL || r == SECOND_CATCH_TRIAL || r == THIRD_CATCH_TRIAL) {
@@ -335,14 +344,14 @@
             type: jsPsychVideoButtonResponse,
             //prompt: `<pre class="pHelpKey">Press [A]                                Press [L]</pre>`,
             prompt: '<p class="pHelpKeyQuestion">Which of the bottom two materials appears most similar to the one on the top?</p>',
-            choices:['LEFT ', 'RIGHT'],
+            choices:['LEFT  ', 'RIGHT'],
             stimulus: catch_array[catch_number],
             margin_vertical: '30px',
             margin_horizontal: '20px',
             autoplay: true,
             response_allowed_while_playing: true,
             loop: true,
-            post_trial_gap: 1000
+            post_trial_gap: 1200
             }
             timeline.push(catch_trial);
             catch_number++;

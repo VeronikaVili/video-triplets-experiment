@@ -79,7 +79,7 @@
 .jspsych-btn-video {
   display: inline-block;
   padding: 13px 75px;
-  margin: 0px 100px;
+  margin: 0px 0px;
   font-size: 30px;
   font-weight: 700;
   font-family: "Open Sans", "Arial", sans-serif;
@@ -94,6 +94,16 @@
   color: #707070;
   background-color: #262626;
   border-color: #636363;
+}
+
+#jspsych-video-button-response-button-1 {
+  padding-left: 9%;
+  padding-right: 3%;
+}
+
+#jspsych-video-button-response-button-0 {
+  padding-right: 9%;
+  padding-left: 5%;
 }
 
 /* only apply the hover style on devices with a mouse/pointer that can hover - issue #977 */

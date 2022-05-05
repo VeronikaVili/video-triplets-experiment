@@ -43,7 +43,7 @@ protocols <- rbind(protocols_A,protocols_B)
 
 stimuli_list <- readxl::read_excel(here::here("R/data/pilot_wood_list.xlsx"))
 protocols2 <- protocols %>% 
-  mutate(name = sprintf("%s_%s_%s.mp4", X1, X2,X3))
+  mutate(name = sprintf("%s_%s_%s.mp4", X1, X2, X3))
 swapped_names <- stimuli_list %>% filter(type == "swapped") %>% pull(name)
 normal_names <- stimuli_list %>% filter(type != "swapped") %>% pull(name)
 
@@ -60,10 +60,21 @@ intersect(swapped_names, swapped_names_protocols)
 setdiff(swapped_names, swapped_names_protocols)
 setdiff(swapped_names_protocols, swapped_names)
 
-protocols %>% jsonlite::write_json("protocol.json")
-protocols %>% 
-  nest_by(prot_id) %>% 
-  jsonlite::write_json("protocol_list.json")
+# export protocols for js
+p <- protocols %>% 
+  mutate(
+    name = sprintf("%s_%s_%s.mp4", X1, X2, X3),
+    pid = str_c(str_pad(prot_id, 3, side = "left", pad = "0"), version)
+  )
+p_list <- p %>% group_split(pid)
+p_names <- p_list %>% map_chr(~unique(.$pid))
+p_text <- p_list %>% 
+  map(~list(video = .$name)) %>% 
+  set_names(p_names) %>% 
+  jsonlite::toJSON()
+final_json <- str_c("const protocols = ", p_text, ";\n")
+readr::write_file(final_json, file = "protocols.js")
+
 # some simple sanity checks
 
 # all 87

@@ -26,7 +26,7 @@
         <script src="jspsych/plugin-call-function.js"> </script>
 
         <!--Uses JSON variable in JavaScipt file-->
-        <script src="protocol.js"></script>
+        <script src="protocols.js"></script>
 
         <!--Loading stylesheet-->
         <link href="jspsych/jspsych.css" rel="stylesheet" type="text/css" />
@@ -44,14 +44,13 @@
     var runOnServer = (typeof jatos !== 'undefined');
     var remoteStimuli = false;
     var fromProlific = false;
-    const pathToVideos = remoteStimuli ? "http://staff.utia.cas.cz/filipj/stimuliData/exp01/" : "demo/"; // keep final slash /
+    const pathToVideos = remoteStimuli ? "https://stimuly.utia.cas.cz/stimuliData/exp01/" : "demo/"; // keep final slash /
+    // example http://stimuly.utia.cas.cz/stimuliData/exp01/practice/031_032_033.mp4
 
     const opts = {
-        consent_required: true, 
         experiment_name: "materials_pilot_01",
         // if forcing protocol number, change it here or via ?p=2
-        protocol_num: 1, 
-        n_exp_trials: -1, 
+        protocol_num: "001A", 
         personCode: "????",
     }
 
@@ -63,9 +62,7 @@
             params = Object.fromEntries(new URLSearchParams(location.search));
         }
         // respond to settings
-        if ("n" in params) opts.n_exp_trials = parseInt(params["n"]);
-        if ("p" in params) opts.protocol_num = parseInt(params["p"]);
-        if (("skip" in params) && params["skip"] === "1") opts.consent_required = false;
+        if ("p" in params) opts.protocol_num = params["p"];
         if (("PROLIFIC_PID" in params)) { 
             opts.personCode = params["PROLIFIC_PID"];
             fromProlific = true;
@@ -77,6 +74,15 @@
         var t = now.toISOString().slice(-25, -5);
         t = t.replaceAll(":", "-").replaceAll("T", "-");
         return t;
+    }
+    // shuffle: https://stackoverflow.com/questions/6274339/how-can-i-shuffle-an-array
+    function shuffle(a) {
+        var j, x, i;
+        for (i = a.length - 1; i > 0; i--) {
+            j = Math.floor(Math.random() * (i + 1));
+            x = a[i]; a[i] = a[j]; a[j] = x;
+        }
+        return a;
     }
 
     /* jsPsych will be initialized in the end of the script */
@@ -343,39 +349,12 @@
 
         // Protocols are numbered, we have only limited number 
         // if the id is smaller than 0 we add protocol number until its positive
-        var idJSON = opts.protocol_num;
-        while (idJSON < 0) {
-            idJSON = idJSON + PROTOCOL_NUMBER_CONSTANT;
-        }
-
-        // If the id is bigger than protocol number it is altered by the modulo operation
-        if (idJSON > PROTOCOL_NUMBER_CONSTANT) {
-            idJSON = idJSON % PROTOCOL_NUMBER_CONSTANT;
-
-        }
-
-        // From adding to smaller and modulo operation the result can be 0 -> we number protocols from 1 to number constant so 0 becomes the number constant
-        if (idJSON == 0) {
-                idJSON = PROTOCOL_NUMBER_CONSTANT;
-        }
-
-        // Finding first video of protocol
-        // In the JSON file, protocol videos are together, so we iterate over the whole protocol batch
-        var idProtokoluJSON = 0;
-        for (var i = 0; i < protocol.length; i += VIDEO_NUMBER_CONSTANT) {
-            console.log(protocol[i].prot_id);
-            if (protocol[i].prot_id == idJSON){
-                idProtokoluJSON = i;
-                break;
-            }
-        }
-
-        // Initializing array of protocol videos
-        for (var j = 0; j < VIDEO_NUMBER_CONSTANT; j++){
-            stimus_string = [ pathToVideos + 'test/' + protocol[i+j].X1 + '_' + protocol[i+j].X2 + '_' + protocol[i+j].X3 + '.mp4'];
-            stimulus_array.push(stimus_string);
-        }
-        console.log(stimulus_array);
+        var pid = opts.protocol_num;
+        var test_videos = protocols[pid].video;
+        // randomize the order
+        test_videos = shuffle(test_videos);
+        // add proper path
+        test_videos = test_videos.map(s => pathToVideos + "test/" + s);
 
         // Initializing array of catch trial videos
         var catch_number = 0;
@@ -392,12 +371,11 @@
         /// Adding test trials
         // Catch trials are inserted at given time represented by constants X_CATCH_TRIAL defined up at the start
         // Later will be divided into individual components in JATOS
-        for (var r = 0; r < stimulus_array.length; r++) {
-            var preload_exp = stimulus_array[r]
+        for (var r = 0; r < test_videos.length; r++) {
             /*Automatic preload of videos*/
             var preload_trial_test = {
                 type: jsPsychPreload,
-                video: preload_exp,
+                video: test_videos.slice(r, r+1),
                 show_progress_bar: false
             }
             experiment_timeline.push(preload_trial_test);
@@ -411,7 +389,7 @@
                 type: jsPsychVideoButtonResponse,
                 prompt: '<p class="pHelpKeyQuestion">Which of the bottom two materials appears most similar to the one on the top?</p>',
                 choices:['LEFT  ', 'RIGHT'],
-                stimulus: stimulus_array[r],
+                stimulus: test_videos.slice(r, r+1), 
                 margin_vertical: '30px',
                 margin_horizontal: '20px',
                 autoplay: true,

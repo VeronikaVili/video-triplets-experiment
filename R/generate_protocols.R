@@ -61,7 +61,9 @@ setdiff(swapped_names, swapped_names_protocols)
 setdiff(swapped_names_protocols, swapped_names)
 
 protocols %>% jsonlite::write_json("protocol.json")
-
+protocols %>% 
+  nest_by(prot_id) %>% 
+  jsonlite::write_json("protocol_list.json")
 # some simple sanity checks
 
 # all 87

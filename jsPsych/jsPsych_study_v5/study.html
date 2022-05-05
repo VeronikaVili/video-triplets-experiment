@@ -2,6 +2,8 @@
     <head>
         <title>Video experiment</title>
     
+        <!--Loading JATOS server library if available-->
+        <script src="jatos.js"></script>
         <!--Loading the jsPsych Library-->
         <script src="jspsych/jspsych.js"></script>
         <!--Loading plugin for showing video stimuli-->
@@ -40,7 +42,9 @@
 
     // setup
     var runOnServer = (typeof jatos !== 'undefined');
+    var remoteStimuli = false;
     var fromProlific = false;
+    const pathToVideos = remoteStimuli ? "http://staff.utia.cas.cz/filipj/stimuliData/exp01/" : "demo/"; // keep final slash /
 
     const opts = {
         consent_required: true, 
@@ -54,9 +58,9 @@
     var params;
     function loadSettings() {
         if (runOnServer) {
-        params = {...jatos.studyJsonInput, ...jatos.batchJsonInput, ...jatos.urlQueryParameters};
+            params = {...jatos.studyJsonInput, ...jatos.batchJsonInput, ...jatos.urlQueryParameters};
         } else {
-        params = Object.fromEntries(new URLSearchParams(location.search));
+            params = Object.fromEntries(new URLSearchParams(location.search));
         }
         // respond to settings
         if ("n" in params) opts.n_exp_trials = parseInt(params["n"]);
@@ -114,6 +118,20 @@
                 var result = {'params': params, 'opts': opts, 'other': other, };
                 return(result);
             }
+        }
+        var upload = {
+            type: jsPsychCallFunction,
+            func: () => {
+                // jsPsych.data.get().localSave('json', opts.experiment_name + "_" + timestamp() + '.json');
+                if (runOnServer) {
+                    var resultData = jsPsych.data.get().json();
+                    jatos.submitResultData(resultData)
+                    .then(() => console.log('upload success'))
+                    .catch(() => console.log('upload error'));
+                } else {
+                    console.log('local experiment');
+                }
+            },
         }
 
         // Welcome screen with name and investigatior info
@@ -268,12 +286,13 @@
             trial_duration: 2000
         };
 
-        var practiceVideoPreload = ['demo/practice/031_032_033.mp4', 'demo/practice/034_035_036.mp4', 'demo/practice/037_038_039.mp4'];
+        var practiceVideos = ['practice/031_032_033.mp4', 'practice/034_035_036.mp4', 'practice/037_038_039.mp4'];
+        practiceVideos = practiceVideos.map(s => pathToVideos + s);
 
         /*Automatic preload of videos*/
         var preload_trial_prac = {
             type: jsPsychPreload,
-            video: practiceVideoPreload,
+            video: practiceVideos,
             show_progress_bar: false
         }
 
@@ -283,10 +302,12 @@
                 choices: ['NEXT'],
                 post_trial_gap: 300
         }
-
-        test_array = [['demo/practice/031_032_033.mp4'],
-                        ['demo/practice/034_035_036.mp4'],
-                        ['demo/practice/037_038_039.mp4']];
+        var start_button = {
+                type: jsPsychHtmlButtonResponse,
+                stimulus: '<p class="btn-next">To start experiment, press START</p>',
+                choices: ['START'],
+                post_trial_gap: 300
+        }
 
         for (var z = 0; z < PRACTICE_NUMBER_CONSTANT; z++) {
             /*Practice trials*/
@@ -299,13 +320,14 @@
                 autoplay: true,
                 response_allowed_while_playing: true,
                 loop: true,
-                stimulus: test_array[z],
+                stimulus: practiceVideos.slice(z, z + 1),
                 post_trial_gap: 300,
                 start: (Math.random() * 4).toFixed(2)
             };
+            if (z > 0) {
+                practice_timeline.push(next_button);
+            }
             practice_timeline.push(practice_trial);
-            // Pushing the next button after video
-            practice_timeline.push(next_button);
         }
 
         /*Informing participant about start of actual experiment*/
@@ -350,22 +372,20 @@
 
         // Initializing array of protocol videos
         for (var j = 0; j < VIDEO_NUMBER_CONSTANT; j++){
-            stimus_string = ['demo/test/' + protocol[i+j].X1 + '_' + protocol[i+j].X2 + '_' + protocol[i+j].X3 + '.mp4'];
+            stimus_string = [ pathToVideos + 'test/' + protocol[i+j].X1 + '_' + protocol[i+j].X2 + '_' + protocol[i+j].X3 + '.mp4'];
             stimulus_array.push(stimus_string);
         }
         console.log(stimulus_array);
 
         // Initializing array of catch trial videos
-        catch_array = [['demo/catch/004_004_029.mp4'],
-                        ['demo/catch/011_011_007.mp4'],
-                        ['demo/catch/030_015_030.mp4']];
         var catch_number = 0;
-        var catch_array_preload = ['demo/catch/004_004_029.mp4','demo/catch/011_011_007.mp4', 'demo/catch/030_015_030.mp4'];
+        var catch_videos = ['catch/004_004_029.mp4','catch/011_011_007.mp4', 'catch/030_015_030.mp4'];
+        catch_videos = catch_videos.map(s => pathToVideos + s);
 
         /*Automatic preload of videos*/
         var preload_trial_catch = {
             type: jsPsychPreload,
-            video: catch_array_preload,
+            video: catch_videos,
             show_progress_bar: false
         }
 
@@ -381,7 +401,12 @@
                 show_progress_bar: false
             }
             experiment_timeline.push(preload_trial_test);
-
+            // preload + next button + trial
+            if (r == 0) {
+                experiment_timeline.push(start_button);
+            } else {
+                experiment_timeline.push(next_button);
+            }
             var test_trial = {
                 type: jsPsychVideoButtonResponse,
                 prompt: '<p class="pHelpKeyQuestion">Which of the bottom two materials appears most similar to the one on the top?</p>',
@@ -396,14 +421,13 @@
                 start: (Math.random() * 4).toFixed(2)
             }
             experiment_timeline.push(test_trial);
-            // Pushing the next button after video
-            experiment_timeline.push(next_button);
+            
             if (r == FIRST_CATCH_TRIAL || r == SECOND_CATCH_TRIAL || r == THIRD_CATCH_TRIAL) {
                 var catch_trial = {
                 type: jsPsychVideoButtonResponse,
                 prompt: '<p class="pHelpKeyQuestion">Which of the bottom two materials appears most similar to the one on the top?</p>',
                 choices:['LEFT  ', 'RIGHT'],
-                stimulus: catch_array[catch_number],
+                stimulus: catch_videos.slice(catch_number, catch_number + 1), //catch_array[catch_number],
                 margin_vertical: '30px',
                 margin_horizontal: '20px',
                 autoplay: true,
@@ -412,9 +436,8 @@
                 post_trial_gap: 300,
                 start: (Math.random() * 4).toFixed(2)
                 }
-                experiment_timeline.push(catch_trial);
-                // Pushing the next button after video
                 experiment_timeline.push(next_button);
+                experiment_timeline.push(catch_trial);
                 catch_number++;
             }
             
@@ -425,7 +448,8 @@
         var end_of_the_experiment = {
             type: jsPsychHtmlButtonResponse,
             stimulus: `<p class="pInfoText">Thank you for taking part in our experiment!</p><br><br>`,
-            choices: ['View raw data (beta)']
+            choices: ['FINISH'],
+            trial_duration: 3000
         };
         var ask_about_info = fromProlific ? [] : [personal_info_fill];
         timeline = [].concat(
@@ -437,8 +461,9 @@
             preload_trial_prac, click_to_practice, ], 
             practice_timeline,
             [
-            click_to_start, preload_trial_catch, ],
-            experiment_timeline, [ end_of_the_experiment ],
+            //click_to_start, 
+            preload_trial_catch, ],
+            experiment_timeline, [ upload, end_of_the_experiment ],
         );
         return(timeline)
     }
@@ -455,7 +480,7 @@
                 if (runOnServer) {
                     jatos.submitResultData(resultJson, jatos.startNextComponent);
                 } else {
-                    jsPsych.data.get().localSave('json', `results-${timestamp}.txt`); 
+                    jsPsych.data.get().localSave('json', `results-${timestamp()}.txt`); 
                 }
             }
         }); 

@@ -1,0 +1,39 @@
+---
+title: "Protocol codes"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = F)
+library(tidyverse)
+library(jsonlite)
+
+n_rep <- 1
+set <- paste0(rep(sprintf("%03d", 1:28), each = 2), c("A", "B")) %>% sort()
+conditions <- list(conditions = rep(set, each = n_rep))
+```
+
+The protocol codes in pilot experiment range from `001A` to `028B`. To double check, here are all codes sorted alphabetically 
+(total count = **`r length(set)`**).
+
+```{r}
+set
+```
+
+Each protocol will be administered **`r n_rep``** times.
+
+## How to setup JATOS
+
+1) Open component properties (on righ side, in blue).
+2) Paste following code into JSON input field (see below, without `##`)
+3) Create a batch (in Study links)
+4) Run experiment once (likely to fail but setup the counter)
+5) You can use the link for experiments!
+6) If you want to check the available protocols in the batch, check Batch session data.
+
+For alternative to Step 4, you can also copy+paste the identical code into the Batch session data.
+
+```{r}
+jsonlite::toJSON(conditions)
+```
+

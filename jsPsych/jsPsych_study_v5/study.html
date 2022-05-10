@@ -42,7 +42,7 @@
 
     // setup
     var runOnServer = (typeof jatos !== 'undefined');
-    var remoteStimuli = false;
+    var remoteStimuli = true;
     var fromProlific = false;
     const pathToVideos = remoteStimuli ? "https://stimuly.utia.cas.cz/stimuliData/exp01/" : "demo/"; // keep final slash /
     // example http://stimuly.utia.cas.cz/stimuliData/exp01/practice/031_032_033.mp4
@@ -83,6 +83,44 @@
             x = a[i]; a[i] = a[j]; a[j] = x;
         }
         return a;
+    }
+    // utilities for random protocol assignment
+	function initBatchConditions() {
+		// Check if 'conditions' are not already in the batch session
+		if (!jatos.batchSession.defined("/conditions")) {
+			// Get the count of each condition
+			conditions = jatos.componentJsonInput.conditions;
+			// Put the conditions in the batch session
+			jatos.batchSession.set("conditions", conditions)
+				.fail(initBatchConditions); // If it fails: try again
+		}
+	}
+    function selectProtocol() {
+		// Get the still available conditions from the Batch Session
+        // If just inialized from component data, use that (data not yet synced)
+        conditions = jatos.batchSession.get("conditions");
+		// If no more conditions throw an error
+		if (conditions.length == 0) {
+			console.log("Error: max number of workers reached. Selecting by random");
+            return randomProtocol();
+			//throw "Max number of workers reached.";
+		}
+		// Get a random condition
+		var randomIndex = Math.floor(Math.random() * conditions.length);
+		var randomCondition = conditions[randomIndex];
+		// Delete the choosen condition from the array
+		conditions.splice(randomIndex, 1);
+		// Set the changed conditions array in the Batch Session.
+		jatos.batchSession.set("conditions", conditions).fail(function () {
+			randomCondition = selectProtocol(); // If it fails: try again
+		});
+		return randomCondition;
+    }
+    function randomProtocol() {
+        // 001A to 028B
+        var i = Math.floor(Math.random() * 28 + 1);
+        var c = Math.random() < 0.5 ? "A" : "B";
+        return ("" + i + c).padStart(4, "0");
     }
 
     /* jsPsych will be initialized in the end of the script */
@@ -146,7 +184,9 @@
             stimulus: `<br><br><br>
                         <p class="pInfoText">Visual fingerprint of material appearance experiment</p>
                         <p class="pUvodNo">Principal Investigator:   Ing. Jiří Filip, Ph.D, ÚTIA AV ČR v.v.i.,</p>
-                        <p class="pUvodNo">filipj@utia.cas.cz</p><br>`,
+                        <p class="pUvodNo">filipj@utia.cas.cz</p>
+                        <p class="pHelpKeyQuestion">${timestamp()}-${opts.protocol_num}</p>
+                        <br>`,
             choices: ['Continue']
         }
 
@@ -448,7 +488,15 @@
     
     var runExperiment = () => { 
         loadSettings();
-        console.log(opts);
+        var pid;
+        if (runOnServer) {
+            initBatchConditions();
+            pid = selectProtocol();
+        } else {
+            pid = randomProtocol();
+        }
+
+        opts.protocol_num = pid;
         jsPsych = initJsPsych({
             show_progress_bar: true,
             display_element: 'jspsych-target',
@@ -463,7 +511,7 @@
             }
         }); 
         var timeline = prepareTimeline();
-        console.log(timeline);
+        //console.log(timeline);
         jsPsych.run(timeline);
     };
     // start the experiment via JATOS or directly 

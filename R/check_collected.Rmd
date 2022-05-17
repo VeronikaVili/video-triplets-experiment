@@ -1,0 +1,131 @@
+---
+title: "Check collected data"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = F)
+
+library(tidyverse)
+library(jsonlite)
+library(jspsychread)
+library(kableExtra)
+
+fn <- here::here("R/data/raw/jatos_results_20220517095331.txt")
+
+stimulus_url_prefix <- "https://stimuly.utia.cas.cz/stimuliData/exp01/"
+
+theme_set(theme_minimal())
+upper_limit <- function(x, limit) { x[x>limit] <- limit; x }
+kt <- function(x) { kbl(x) %>% kable_paper("hover", full_width = F) }
+```
+
+```{r protocols}
+n_rep <- 1
+set <- paste0(rep(sprintf("%03d", 1:28), each = 2), c("A", "B")) %>% sort()
+# conditions <- list(conditions = rep(set, each = n_rep))
+```
+
+```{r processing}
+d <- read_jspsych(fn, single = F)
+n <- length(unique(d$record))
+
+browser <-
+  d %>% 
+  filter(trial_type == "browser-check", trial_index == 0) %>% 
+  unnest_wider(raw)
+
+meta <- 
+  d %>% 
+  filter(trial_type == "call-function", trial_index == 1) %>% 
+  unnest_wider(raw) %>% 
+  unnest_wider(value) %>% 
+  unnest_wider(params) %>% 
+  unnest_wider(opts) %>% 
+  unnest_wider(other) %>% 
+  select(-(2:5))
+
+video_trials <-
+  d %>% 
+  filter(trial_type == "video-button-response") %>% 
+  mutate(processed = map(raw, ~parse_video_keyboard_response(.x))) %>% 
+  unnest(processed)
+
+video_trials <- 
+  video_trials %>% 
+  mutate(video_long = str_remove_all(stimulus, stimulus_url_prefix),
+         video_file = str_remove_all(video_long, "^.*/"),
+         video_group = str_remove_all(video_long, "/.*$"), 
+         video = str_remove_all(video_file, ".mp4")) %>% 
+  group_by(record) %>% 
+  mutate(index = 1:n()) %>% ungroup()
+
+vd <- 
+  video_trials %>% 
+  select(record, index, video_group, video, response, rt)
+
+catch <-
+  vd %>% filter(video_group == "catch") %>% 
+  separate(video, into = c("orig", "left", "right"), sep = "_", remove = F) %>% 
+  mutate(expected = case_when(orig == left ~ 0L, orig == right ~ 1L, T ~ NA_integer_)) %>% 
+  mutate(correct = response == expected) %>% 
+  left_join(meta %>% select(record, PROLIFIC_PID), by = "record")
+```
+
+## Info
+
+This is report based on file: **`r basename(fn)`**
+
+The file contains **N=`r n` records**.
+
+## Time course
+
+```{r}
+vd %>% 
+  mutate(rt_top = upper_limit(rt, 10), above = rt > 10) %>% 
+  left_join(meta %>% select(record, PROLIFIC_PID), by = "record") %>% 
+  ggplot(aes(x = index, y = rt, group = record)) + 
+  geom_point() + geom_path(aes(colour = PROLIFIC_PID))
+```
+
+## Catch trials
+
+```{r}
+catch_errors <-
+  catch %>% group_by(PROLIFIC_PID) %>% summarise(n_error = sum(!correct))
+catch_errors %>% kt()
+
+valid0 <- catch_errors %>% filter(n_error == 0) %>% pull(PROLIFIC_PID)
+valid1 <- catch_errors %>% filter(n_error <= 1) %>% pull(PROLIFIC_PID)
+```
+
+### Approve
+
+The following people made **no error** in catch trials:
+
+> `r valid0` 
+
+The following people made **max. 1 error** in catch trials:
+
+> `r valid1` 
+
+## Protocols
+
+In this batch we administered the following protocols:
+
+```{r}
+meta %>% count(protocol_num) %>% kt()
+```
+
+If we accept all people with max. 1 error in catch trials (N=`r length(valid1)`),
+the following protocols remain to be administered:
+
+```{r}
+used_valid1 <- 
+  meta %>% 
+  filter(PROLIFIC_PID %in% valid1) %>% 
+  count(PROLIFIC_PID, protocol_num) %>% 
+  pull(protocol_num)
+jsonlite::toJSON(list(conditions = setdiff(rep(set, each = n_rep), used_valid1)))
+```
+

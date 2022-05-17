@@ -92,6 +92,10 @@ protocols %>%
   group_by(video_triplet_id,version) %>% 
   count()
 
+# same triplet never in one protocol twice
+protocols %>% 
+  group_by(video_triplet_id,prot_id,version) %>% 
+  count() %>% pull(n) %>% all(.== 1)
 
 # all 1218
 protocols %>% 

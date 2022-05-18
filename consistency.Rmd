@@ -1,0 +1,84 @@
+---
+title: "Consistency"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = F)
+
+library(tidyverse)
+library(kableExtra)
+
+exp1 <- readRDS(here::here("R/data/pilot.rds"))
+
+theme_set(theme_minimal())
+upper_limit <- function(x, limit) { x[x>limit] <- limit; x }
+kt <- function(x) { kbl(x) %>% kable_paper("hover", full_width = F) }
+
+```
+
+## Dataset
+
+```{r}
+vd <- exp1$vd %>% filter(video_group == "test")
+n <- length(unique(vd$record))
+vdr <- 
+  vd %>% 
+  mutate(selected = if_else(response == 0, left, right)) %>% 
+  mutate(triplet = if_else(as.numeric(left) < as.numeric(right), 
+                           str_c(orig, left, right, sep = "_"), 
+                           str_c(orig, right, left, sep = "_")))
+```
+
+We have data from N=`r n` people. 
+Dataset contains `r nrow(vd)` ratings of `r length(unique(vdr$triplet))` triplets.
+
+### Duplicate protocol
+
+The record number 8 (5be742980bedce00010bcf31) is later, 
+for consistency will be removed.
+
+```{r}
+extra_protocols <- 
+  exp1$meta %>% count(protocol_num) %>% filter(n > 1) %>% pull(protocol_num)
+exp1$meta %>% filter(protocol_num %in% extra_protocols) %>% 
+  select(record, PROLIFIC_PID, protocol_num, timestamp) %>% kt()
+vdr <- vdr %>% filter(record != 8)
+```
+
+## Consistency
+
+```{r}
+vdr <-
+  vdr %>% 
+  mutate(
+    trip_response = if_else(str_sub(triplet, 5, 7) == selected, 1, 2),
+    trip_response2 = if_else(str_sub(triplet, 9, 11) == selected, 2, 1),
+  )
+stopifnot(all(vdr$trip_response == vdr$trip_response2))
+vdr <- vdr %>% select(-trip_response2)
+```
+
+```{r}
+consistency <- 
+  vdr %>% 
+  group_by(triplet) %>% 
+  summarise(
+    mean_tr = mean(trip_response) - 1,
+    consistency = case_when(mean_tr %in% c(0, 1) ~ "4:0",
+                            mean_tr %in% c(0.25, 0.75) ~ "3:1",
+                            mean_tr %in% c(0.50) ~ "2:2"),
+  ) 
+stopifnot(all(!is.na(consistency$consistency))) # comparisons with floats, so doublechecking
+
+consistency %>% 
+  ggplot(aes(x = mean_tr)) + 
+  geom_histogram(binwidth = .05) + 
+  coord_cartesian(xlim = c(0, 1))
+
+consistency %>% 
+  count(consistency) %>% 
+  mutate(pc = n / sum(n) * 100) %>% 
+  kt()
+```
+

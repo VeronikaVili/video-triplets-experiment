@@ -11,7 +11,7 @@ library(jsonlite)
 library(jspsychread)
 library(kableExtra)
 
-fn <- here::here("R/data/raw/jatos_results_20220517095331.txt")
+fn <- here::here("R/data/raw/jatos_results_20220518155753.txt")
 
 stimulus_url_prefix <- "https://stimuly.utia.cas.cz/stimuliData/exp01/"
 
@@ -62,11 +62,13 @@ video_trials <-
 
 vd <- 
   video_trials %>% 
-  select(record, index, video_group, video, response, rt)
+  select(record, index, video_group, video, response, rt) %>% 
+  separate(video, into = c("orig", "left", "right"), sep = "_", remove = F)
+
+saveRDS(list(browser = browser, meta = meta, vd = vd, all = d), file = here::here("R/data/pilot.rds"))
 
 catch <-
   vd %>% filter(video_group == "catch") %>% 
-  separate(video, into = c("orig", "left", "right"), sep = "_", remove = F) %>% 
   mutate(expected = case_when(orig == left ~ 0L, orig == right ~ 1L, T ~ NA_integer_)) %>% 
   mutate(correct = response == expected) %>% 
   left_join(meta %>% select(record, PROLIFIC_PID), by = "record")
@@ -85,10 +87,50 @@ vd %>%
   mutate(rt_top = upper_limit(rt, 10), above = rt > 10) %>% 
   left_join(meta %>% select(record, PROLIFIC_PID), by = "record") %>% 
   ggplot(aes(x = index, y = rt, group = record)) + 
-  geom_point() + geom_path(aes(colour = PROLIFIC_PID))
+  geom_point(alpha = .2) + geom_path(aes(colour = PROLIFIC_PID), alpha = .5) + 
+  theme(legend.position = "none")
 ```
 
-## Catch trials
+Median response times.
+
+```{r}
+rts <- 
+  vd %>% 
+  left_join(meta %>% select(record, PROLIFIC_PID), by = "record") %>% 
+  filter(video_group != "practice") %>% 
+  group_by(PROLIFIC_PID) %>% 
+  summarise(median_rt = median(rt) / 1000, 
+            q25 = quantile(rt, 0.25) / 1000, 
+            q75 = quantile(rt, 0.75) / 1000)
+
+rts %>% 
+  ggplot(aes(x = median_rt)) + 
+  geom_histogram(binwidth = .5) + coord_cartesian(xlim = c(0, 10))
+```
+
+Top 5 fastest:
+
+```{r}
+rts %>% arrange(median_rt) %>% slice_head(n = 5) %>% kt()
+```
+
+## Responses
+
+Left/right bias:
+
+```{r}
+lr <- 
+  vd %>% 
+  left_join(meta %>% select(record, PROLIFIC_PID), by = "record") %>% 
+  filter(video_group == "test") %>% 
+  group_by(PROLIFIC_PID) %>% 
+  summarise(lr_bias = mean(response))
+
+lr %>% ggplot(aes(x = lr_bias)) + geom_histogram(binwidth = .05) + 
+  coord_cartesian(xlim = 0:1) 
+```
+
+### Catch trials
 
 ```{r}
 catch_errors <-
@@ -127,5 +169,21 @@ used_valid1 <-
   count(PROLIFIC_PID, protocol_num) %>% 
   pull(protocol_num)
 jsonlite::toJSON(list(conditions = setdiff(rep(set, each = n_rep), used_valid1)))
+```
+
+## Other
+
+### Browser
+
+```{r}
+browser %>% count(browser) %>% kt()
+```
+
+Resolution
+
+```{r}
+browser %>% 
+  ggplot(aes(x = width, y = height)) + geom_point(alpha = .25) + 
+  coord_cartesian(xlim = c(0, 2500), ylim = c(0, 2000))
 ```
 

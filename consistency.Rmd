@@ -82,3 +82,21 @@ consistency %>%
   kt()
 ```
 
+Brief and ugly estimation of consistence: 
+We are imagining there is a correct answer and 
+we are trying to estimate the probability people are selecting it in each trial.
+(p ~ 0.80)
+
+```{r}
+pf <- function(p) {
+  res <- numeric(3)
+  px <- 1 - p
+  res[1] <- 6 * px ^ 2 * p ^ 2
+  res[2] <- 4 * px * p ^ 3 + 4 * px ^ 3 * p
+  res[3] <- px ^ 4 + p ^ 4
+  stopifnot(abs(sum(res) - 1) < .001)
+  res
+}
+pf(.81)
+```
+

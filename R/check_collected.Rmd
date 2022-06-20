@@ -11,7 +11,7 @@ library(jsonlite)
 library(jspsychread)
 library(kableExtra)
 
-fn <- here::here("R/data/raw/jatos_results_20220518155753.txt")
+fn <- here::here("R/data/raw/jatos_results_20220520104548.txt")
 
 stimulus_url_prefix <- "https://stimuly.utia.cas.cz/stimuliData/exp01/"
 

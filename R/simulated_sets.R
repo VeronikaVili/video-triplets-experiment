@@ -2,8 +2,19 @@
 library(tidyverse)
 library(imager)
 
-d <- readRDS(here::here("R", "data", "pilot_56.rds"))
+source(here::here("R","utils_simulation.R"))
 
+d <- readRDS(here::here("R", "data", "pilot.rds"))
+vd <- d$vd %>% filter(video_group == "test")
+n <- length(unique(vd$record))
+vdr <- 
+  vd %>% 
+  mutate(selected = if_else(response == 0, left, right)) %>% 
+  mutate(triplet = if_else(as.numeric(left) < as.numeric(right), 
+                           str_c(orig, left, right, sep = "_"), 
+                           str_c(orig, right, left, sep = "_")))
+vdr <- vdr %>% filter(record != 8)
+d <- vdr
 # random data ------------------------------------------------
 n <- 30
 set.seed(42)
@@ -62,33 +73,7 @@ for (i in 1:n) {
   a <- patch(set2$h[i] * 16 + 2, set2$v[i] * 16 + 2)
   imager::save.image(a, file.path(dir_sets, "dim2", sprintf("%03d.png", i)))
 }
-# simulate responses ------------------------------------
-L2_distance <- function(i1, i2, set, ...) {
-  x1 <- as.numeric(set[i1, ])
-  x2 <- as.numeric(set[i2, ])
-  m <- rbind(
-    matrix(x1, nrow = 1), 
-    matrix(x2, nrow = 1)
-  )
-  as.numeric(dist(m, ...))
-}
 
-add_distances <- function(dd, set) {
-  dx <- 
-    dd %>% 
-    select(-response, -selected, -rt) %>% 
-    mutate(L2_left = NA_real_, L2_right = NA_real_, 
-           response = NA_integer_, selected = NA_character_)
-  for (i in 1:nrow(dx)) {
-    dx$L2_left[i] <- L2_distance(
-      as.numeric(dx$orig[i]), as.numeric(dx$left[i]), set)
-    dx$L2_right[i] <- L2_distance(
-      as.numeric(dx$orig[i]), as.numeric(dx$right[i]), set)
-    dx$response[i] <- ifelse(dx$L2_left[i] < dx$L2_right[i], 0, 1)
-    dx$selected[i] <- ifelse(dx$L2_left[i] < dx$L2_right[i], dx$left[i], dx$right[i])
-  }
-  dx
-} 
 
 d1 <- add_distances(d, set1)
 d2 <- add_distances(d, set2)
@@ -102,3 +87,87 @@ results <- list(
 
 writexl::write_xlsx(results, file.path(dir_sets, "simulated_sets.xlsx"))
 
+d_full <- complete_responses(d)
+
+d1 <- add_distances(d_full, set1)
+d2 <- add_distances(d_full, set2)
+d3 <- add_distances(d_full, set3)
+
+results_full <- list(
+  dim1_simulated = d1, dim1_values = set1 %>% mutate(sample = 1:n(), .before = everything()),
+  dim2_simulated = d2, dim2_values = set2 %>% mutate(sample = 1:n(), .before = everything()),
+  dim3_simulated = d3, dim3_values = set3 %>% mutate(sample = 1:n(), .before = everything())
+)
+
+writexl::write_xlsx(results_full, file.path(dir_sets, "simulated_sets_full.xlsx"))
+
+
+# 80% of all data ---------------------------------------------------------
+
+d_full <- complete_responses(d)
+d80 <-  sample_frac(d_full, 0.8)
+
+d1 <- add_distances(d80, set1)
+d2 <- add_distances(d80, set2)
+d3 <- add_distances(d80, set3)
+
+results_full <- list(
+  dim1_simulated = d1, dim1_values = set1 %>% mutate(sample = 1:n(), .before = everything()),
+  dim2_simulated = d2, dim2_values = set2 %>% mutate(sample = 1:n(), .before = everything()),
+  dim3_simulated = d3, dim3_values = set3 %>% mutate(sample = 1:n(), .before = everything())
+)
+
+writexl::write_xlsx(results_full, file.path(dir_sets, "simulated_sets_80.xlsx"))
+
+
+# 60% of all data ---------------------------------------------------------
+set.seed(60)
+d_full <- complete_responses(d)
+d60 <-  sample_frac(d_full, 0.6)
+
+d1 <- add_distances(d60, set1)
+d2 <- add_distances(d60, set2)
+d3 <- add_distances(d60, set3)
+
+results_full <- list(
+  dim1_simulated = d1, dim1_values = set1 %>% mutate(sample = 1:n(), .before = everything()),
+  dim2_simulated = d2, dim2_values = set2 %>% mutate(sample = 1:n(), .before = everything()),
+  dim3_simulated = d3, dim3_values = set3 %>% mutate(sample = 1:n(), .before = everything())
+)
+
+writexl::write_xlsx(results_full, file.path(dir_sets, "simulated_sets_60.xlsx"))
+
+# 40% of all data ---------------------------------------------------------
+set.seed(40)
+
+d_full <- complete_responses(d)
+d40 <-  sample_frac(d_full, 0.4)
+
+d1 <- add_distances(d40, set1)
+d2 <- add_distances(d40, set2)
+d3 <- add_distances(d40, set3)
+
+results_full <- list(
+  dim1_simulated = d1, dim1_values = set1 %>% mutate(sample = 1:n(), .before = everything()),
+  dim2_simulated = d2, dim2_values = set2 %>% mutate(sample = 1:n(), .before = everything()),
+  dim3_simulated = d3, dim3_values = set3 %>% mutate(sample = 1:n(), .before = everything())
+)
+
+writexl::write_xlsx(results_full, file.path(dir_sets, "simulated_sets_40.xlsx"))
+
+# 20% of all data ---------------------------------------------------------
+set.seed(20)
+d_full <- complete_responses(d)
+d20 <-  sample_frac(d_full, 0.2)
+
+d1 <- add_distances(d20, set1)
+d2 <- add_distances(d20, set2)
+d3 <- add_distances(d20, set3)
+
+results_full <- list(
+  dim1_simulated = d1, dim1_values = set1 %>% mutate(sample = 1:n(), .before = everything()),
+  dim2_simulated = d2, dim2_values = set2 %>% mutate(sample = 1:n(), .before = everything()),
+  dim3_simulated = d3, dim3_values = set3 %>% mutate(sample = 1:n(), .before = everything())
+)
+
+writexl::write_xlsx(results_full, file.path(dir_sets, "simulated_sets_20.xlsx"))

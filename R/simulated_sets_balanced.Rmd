@@ -1,0 +1,150 @@
+---
+title: "Simulated sets"
+output: html_document
+date: "`r format(Sys.time(), '%Y-%m-%d')`"
+---
+
+The following code generates a simulated set 
+of stimuli and corresponding similarity judgements. 
+The stimuli are uniformly distributed in 3D space (intervals (0, 1)) and 
+can be imagined as random colours in RGB space.
+
+Notes
+
+- the uniformity is not absolute, we added small amount of noise to avoid identical distances
+- similarity is evaluated via the Euclidean distance (of 3D vectors)
+- we created several sets with increasing numbers (27, 64, 125, 216), i.e. 3^3, 4^3, 5^3, 6^3
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = F)
+
+library(tidyverse)
+library(writexl)
+
+source(here::here("R", "utils_simulation.R"))
+
+theme_set(theme_minimal())
+
+delta <- 0.05
+default_distance <- function(n, delta = 0) { (1 - 2 * delta) / (n - 1) }
+# how the interval is divided
+values <- function(n, delta = 0) {
+  tibble(index = 1:n, value = delta + default_distance(n, delta) * (index - 1))
+}
+cube <- function(vals) {
+  crossing(
+    vals %>% rename_with(~ str_c(.x, "_1")),
+    vals %>% rename_with(~ str_c(.x, "_2")), 
+    vals %>% rename_with(~ str_c(.x, "_3"))
+  )
+}
+add_noise_3d <- function(v3, dev) {
+  v3 %>% 
+    mutate(
+      value_1 = value_1 + runif(n(), min = -dev, max = dev),
+      value_2 = value_2 + runif(n(), min = -dev, max = dev),
+      value_3 = value_3 + runif(n(), min = -dev, max = dev)
+    )
+}
+all_values <- function(d) { c(d$value_1, d$value_2, d$value_3) }
+
+set.seed(42)
+stimuli3 <- values(3, delta) %>% cube() %>% add_noise_3d(dev = 0.02) %>% 
+  mutate(colour = rgb(value_1, value_2, value_3)) %>% mutate(index = 1:n(), .before = 1)
+stimuli4 <- values(4, delta) %>% cube() %>% add_noise_3d(dev = 0.02) %>% 
+  mutate(colour = rgb(value_1, value_2, value_3)) %>% mutate(index = 1:n(), .before = 1)
+stimuli5 <- values(5, delta) %>% cube() %>% add_noise_3d(dev = 0.02) %>% 
+  mutate(colour = rgb(value_1, value_2, value_3)) %>% mutate(index = 1:n(), .before = 1)
+stimuli6 <- values(6, delta) %>% cube() %>% add_noise_3d(dev = 0.02) %>% 
+  mutate(colour = rgb(value_1, value_2, value_3)) %>% mutate(index = 1:n(), .before = 1)
+
+stopifnot(all_values(stimuli3) < 1)
+stopifnot(all_values(stimuli3) > 0)
+stopifnot(all_values(stimuli4) < 1)
+stopifnot(all_values(stimuli4) > 0)
+stopifnot(all_values(stimuli5) < 1)
+stopifnot(all_values(stimuli5) > 0)
+stopifnot(all_values(stimuli6) < 1)
+stopifnot(all_values(stimuli6) > 0)
+
+complete3 <- complete_responses(stimuli3 %>% rename(orig = index))
+complete4 <- complete_responses(stimuli4 %>% rename(orig = index))
+complete5 <- complete_responses(stimuli5 %>% rename(orig = index))
+complete6 <- complete_responses(stimuli6 %>% rename(orig = index))
+
+```
+
+```{r, echo=FALSE, message=FALSE}
+system.time(r3 <- complete3 %>% add_distances_vectorized(set = stimuli3 %>% select(starts_with("val"))))
+system.time(r4 <- complete4 %>% add_distances_vectorized(set = stimuli4 %>% select(starts_with("val"))))
+system.time(r5 <- complete5 %>% add_distances_vectorized(set = stimuli5 %>% select(starts_with("val"))))
+system.time(r6 <- complete6 %>% add_distances_vectorized(set = stimuli6 %>% select(starts_with("val"))))
+```
+
+```{r}
+data_list <- list(
+  sim027_responses = r3, sim027_values = stimuli3,
+  sim064_responses = r4, sim064_values = stimuli4,
+  sim125_responses = r5, sim125_values = stimuli5,
+  sim216_responses = r6, sim216_values = stimuli6
+)
+folder <- here::here("R", "data", "simulated_sets", "balanced")
+zipfile <- file.path(folder, "balanced.zip")
+if (!dir.exists(folder)) dir.create(folder)
+
+file_list <- names(data_list) %>% map(~ str_c(file.path(folder, .x), ".csv"))
+x_ <- map2(data_list, file_list, ~ write_csv(.x, file = .y))
+x_ <- file_list %>% map(~ zip(zipfile, .x))
+# write_xlsx(
+#   data_list, 
+#   path = here::here("R", "data", "simulated_sets", "simulated_sets_balanced.xlsx")
+# )
+```
+
+
+## MDS on Euclidean distance data
+
+### Set 27
+
+```{r}
+d3 <- dist(stimuli3 %>% select(starts_with("val")))
+mds3 <- cmdscale(d3, k = 2)
+
+qplot(mds3[, 1], mds3[, 2], colour = stimuli3$colour, size = I(10)) + 
+  scale_colour_identity() + 
+  labs(x = "MDS dim 1", y = "MDS dim 2", title = "Set with 27 samples")
+```
+
+### Set 64
+
+```{r}
+d4 <- dist(stimuli4 %>% select(starts_with("val")))
+mds4 <- cmdscale(d4, k = 2)
+
+qplot(mds4[, 1], mds4[, 2], colour = stimuli4$colour, size = I(10)) + 
+  scale_colour_identity() + 
+  labs(x = "MDS dim 1", y = "MDS dim 2", title = "Set with 64 samples")
+```
+
+### Set 125
+
+```{r}
+d5 <- dist(stimuli5 %>% select(starts_with("val")))
+mds5 <- cmdscale(d5, k = 2)
+
+qplot(mds5[, 1], mds5[, 2], colour = stimuli5$colour, size = I(10)) + 
+  scale_colour_identity() + 
+  labs(x = "MDS dim 1", y = "MDS dim 2", title = "Set with 125 samples")
+```
+
+### Set 216
+
+```{r}
+d6 <- dist(stimuli6 %>% select(starts_with("val")))
+mds6 <- cmdscale(d6, k = 2)
+
+qplot(mds6[, 1], mds6[, 2], colour = stimuli6$colour, size = I(10)) + 
+  scale_colour_identity() + 
+  labs(x = "MDS dim 1", y = "MDS dim 2", title = "Set with 216 samples")
+```
+

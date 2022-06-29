@@ -5,3 +5,9 @@
 
 *.mp4
 R/*.html
+
+R/**/*.rds
+R/**/*.xlsx
+R/**/*.csv
+R/**/*.png
+R/**/*.zip

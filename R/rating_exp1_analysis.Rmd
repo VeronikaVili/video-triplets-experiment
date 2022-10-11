@@ -1,0 +1,96 @@
+---
+title: "Rating Exp1"
+author: "Filip Děchtěrenko"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(message = F)
+knitr::opts_chunk$set(warning = F)
+```
+
+```{r}
+
+library(tidyverse)
+library(here)
+raw <- read_table2(here("R/data/EXP1_rating_embedding_10dims_all.txt"), col_names = F) %>% 
+  select(-X31) %>% 
+  mutate(dimension = rep(1:10, each = 9)) 
+df <- raw %>% 
+  pivot_longer(cols = -dimension, names_to = "material_id", values_to = "rating") %>% 
+  arrange(material_id) %>% 
+  mutate(rater_id = rep(1:9, times = 300)) %>% 
+  group_by(rater_id) %>% 
+  mutate(rating_scaled = (rating - mean(rating))/sd(rating) )
+
+rating_names <- tibble(dimension = 1:10, dim_name = c("brightness","glossiness","colourfulness","directionality","complexity","contrast","roughness","patchiness/regularity","line elongation","spatial scale"))
+df <- df %>% left_join(rating_names)
+
+df %>% pivot_wider(id_cols = rater_id, names_from = material_id, values_from = rating)
+```
+
+PCA on averaged ratings per material
+
+```{r}
+df_averaged <- df %>% 
+  group_by(material_id,dim_name) %>% 
+  summarize(rating = mean(rating),
+            rating_scaled = mean(rating_scaled), .groups = "drop") 
+df_averaged %>% 
+  select(-rating_scaled) %>% 
+  pivot_wider(id_cols = material_id, names_from = dim_name, values_from = rating) %>% 
+  select(-material_id) %>%
+  clipr::write_clip(object_type = "table")
+  psych::pca(nfactors = 4)
+```
+
+We can try z-scoring for each participant (this could solve the problem with individual extreme biases)
+
+```{r}
+p <- df %>% 
+  ggplot(aes(x = material_id, y = rating)) + 
+
+  facet_wrap(~dimension, ncol = 3)+
+  ggtitle("original responses")
+p + geom_point()
+ggsave(here("R/Fig_rating_unscaled.png"), p + geom_point(size = 3), width = 12, height = 12)
+
+
+p <- df %>% 
+  ggplot(aes(x = material_id, y = rating_scaled, group = material_id)) + 
+  facet_wrap(~dimension, ncol = 3) +
+  ggtitle("scaled responses")
+
+p + geom_point()
+ggsave(here("R/Fig_rating_scaled.png"), p + geom_point(size = 3), width = 12, height = 12)
+```
+
+Scaled looks even better
+
+```{r}
+p <- df %>% 
+  ggplot(aes(x = material_id, y = rating_scaled, group = material_id, col = as.character(rater_id))) + 
+
+  facet_wrap(~dimension, ncol = 3) +
+  ggtitle("Scaled responses with participants")
+p + geom_point()
+ggsave(here("R/Fig_participants.png"), p+geom_point(size = 3), width = 12, height = 12)
+```
+
+We can look for individual participants, who scored differently
+
+
+
+```{r}
+p <- df %>% 
+  ggplot(aes(x = material_id, y = rating_scaled, group = material_id)) + 
+  facet_wrap(~dimension, ncol = 3) +
+  stat_summary(fun.data = "mean_cl_boot", col = "red")+
+  ggtitle("scaled responses with mean")
+p + geom_point()
+ggsave(here("R/Fig_rating_scaled_mean.png"), p + geom_point(size = 3), width = 12, height = 12)
+
+```
+

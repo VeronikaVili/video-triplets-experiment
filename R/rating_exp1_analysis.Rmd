@@ -15,20 +15,33 @@ knitr::opts_chunk$set(warning = F)
 
 library(tidyverse)
 library(here)
-raw <- read_table2(here("R/data/EXP1_rating_embedding_10dims_all.txt"), col_names = F) %>% 
+raw <- read_table2(here("R/data/EXP1_rating_embedding_10dims_all_101122.txt"), col_names = F) %>% 
   select(-X31) %>% 
-  mutate(dimension = rep(1:10, each = 9)) 
+  mutate(dimension = rep(1:10, each = 45)) 
 df <- raw %>% 
   pivot_longer(cols = -dimension, names_to = "material_id", values_to = "rating") %>% 
   arrange(material_id) %>% 
-  mutate(rater_id = rep(1:9, times = 300)) %>% 
+  mutate(rater_id = rep(1:45, times = 300)) %>% 
   group_by(rater_id) %>% 
   mutate(rating_scaled = (rating - mean(rating))/sd(rating) )
 
 rating_names <- tibble(dimension = 1:10, dim_name = c("brightness","glossiness","colourfulness","directionality","complexity","contrast","roughness","patchiness/regularity","line elongation","spatial scale"))
 df <- df %>% left_join(rating_names)
 
-df %>% pivot_wider(id_cols = rater_id, names_from = material_id, values_from = rating)
+raw_scaled <- 
+  df %>% 
+  mutate(material_id = str_remove(material_id,"X") %>% as.numeric()) %>% 
+  arrange(dimension,rater_id,material_id) %>% 
+  pivot_wider(id_cols = c(rater_id,dimension), names_from = material_id, values_from = rating_scaled) %>% 
+  ungroup()
+write_csv(raw_scaled, here("R/data/EXP1_rating_embedding_10dims_all_scaled.txt"))
+write_rds(df, here("R/data/EXP1_rating_embedding_10dims_all_scaled.rds"))
+
+reraw_scaled  
+m <- raw_scaled %>% select(-rater_id,-dimension)
+sort(colnames(m))
+  
+  mutate(rating_scaled)
 ```
 
 PCA on averaged ratings per material

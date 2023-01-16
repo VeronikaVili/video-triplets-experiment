@@ -1,0 +1,132 @@
+---
+title: "Mulitple regression"
+author: "FD"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse); theme_set(theme_minimal(16))
+library(here)
+
+raw <- read_table2(here("R/data/EXP1_rating_embedding_10dims_all_101122.txt"), col_names = F) %>% 
+  select(-X31) %>% 
+  mutate(dimension = rep(1:10, each = 45)) 
+df_exp1 <- raw %>% 
+  pivot_longer(cols = -dimension, names_to = "material_id", values_to = "rating") %>% 
+  arrange(material_id) %>% 
+  mutate(rater_id = rep(1:45, times = 300)) %>% 
+  group_by(rater_id) %>% 
+  mutate(rating_scaled = (rating - mean(rating))/sd(rating) )
+
+rating_names <- tibble(dimension = 1:10, dim_name = c("brightness","glossiness","colourfulness","directionality","complexity","contrast","roughness","patchiness/regularity","line elongation","spatial scale"))
+df_exp1 <- df_exp1 %>% left_join(rating_names)
+
+
+vice <- read_csv(here("R/data/EXP1_VICEembedding_01.csv"),col_names = F) 
+colnames(vice) <- paste0("vice",1:9)
+vice <- vice %>% 
+  mutate(material_id = paste0("X",1:30))
+
+df_exp1_nested <- df_exp1 %>% 
+  ungroup() %>% 
+  nest_by(dim_name)
+
+
+df <- df_exp1 %>% 
+  group_by(material_id,dim_name) %>% 
+  summarize(rating = mean(rating),
+            rating_scaled = mean(rating_scaled)) %>% 
+  select(material_id, rating, dim_name) %>% 
+  pivot_wider(names_from = dim_name, values_from = rating) %>% 
+  left_join(vice)
+
+df_scaled <- df_exp1 %>% 
+  group_by(material_id,dim_name) %>% 
+  summarize(rating = mean(rating),
+            rating_scaled = mean(rating_scaled)) %>% 
+  select(material_id, rating_scaled, dim_name) %>% 
+  pivot_wider(names_from = dim_name, values_from = rating_scaled) %>% 
+  left_join(vice)
+vice_fit <- function(dfx) {
+  lm(value ~ brightness+colourfulness+complexity+contrast+glossiness+directionality+`line elongation` + `patchiness/regularity` + `spatial scale` +  roughness, data = dfx)
+}
+
+print_stars <- function(p) {
+  ifelse(p < 0.001,"***",
+         ifelse(p < 0.01,"**",
+                ifelse(p < 0.05,"*","")))
+}
+```
+
+##  Scatterplots of ratings and vice
+I am showing correlation only for VICE with 9 dimensions and rating from video study. This is for first dimension only, but the general patrern in similar for the rest there are low values for some materials 
+
+```{r}
+
+df %>% ggplot(aes(x = brightness, y = vice1)) + geom_point(size = 2) + theme(aspect.ratio = 1)
+df %>% ggplot(aes(x = colourfulness, y = vice1)) + geom_point(size = 2) + theme(aspect.ratio = 1)
+df %>% ggplot(aes(x = complexity, y = vice1)) + geom_point(size = 2) + theme(aspect.ratio = 1)
+df %>% ggplot(aes(x = contrast, y = vice1)) + geom_point(size = 2) + theme(aspect.ratio = 1)
+df %>% ggplot(aes(x = directionality, y = vice1)) + geom_point(size = 2) + theme(aspect.ratio = 1)
+df %>% ggplot(aes(x = glossiness, y = vice1)) + geom_point(size = 2) + theme(aspect.ratio = 1)
+df %>% ggplot(aes(x = `line elongation`, y = vice1)) + geom_point(size = 2) + theme(aspect.ratio = 1)
+df %>% ggplot(aes(x = `patchiness/regularity`, y = vice1)) + geom_point(size = 2) + theme(aspect.ratio = 1)
+df %>% ggplot(aes(x = roughness, y = vice1)) + geom_point(size = 2) + theme(aspect.ratio = 1)
+df %>% ggplot(aes(x = `spatial scale`, y = vice1)) + geom_point(size = 2) + theme(aspect.ratio = 1)
+```
+
+## Correlation between rating and vice
+
+Just a quick visual inspection, colourfulness, complexity and contrast seems highly correlated.
+
+```{r}
+df %>% ungroup() %>% select(brightness:`spatial scale`,vice1) %>% as.matrix() %>% pairs()
+```
+
+### Vice dimensions - raw data
+
+```{r}
+
+df_lm <- df %>% 
+  pivot_longer(cols = vice1:vice9,names_to = "vice_dimension") %>% 
+  ungroup() %>% 
+  nest_by(vice_dimension) %>% 
+  mutate(lm_obj = list(vice_fit(data)),
+         R2 = (lm_obj %>% summary())$r.squared) %>% 
+  mutate(coefs = list(broom::tidy(lm_obj %>% summary)))  %>% 
+  unnest(coefs) %>% 
+  mutate(est = sprintf("%.2f%s",estimate,print_stars(p.value))) %>% 
+  select(vice_dimension:term,est) %>% 
+  filter(term != "(Intercept)") %>% 
+  pivot_wider(id_cols = vice_dimension:R2,names_from = term, values_from = est) %>% 
+  select(-data,-lm_obj)
+
+df_lm %>% 
+  knitr::kable(caption = "regression coefficients for videos with raw rating values",digits = 2)
+
+df_lm$R2 %>% mean() %>% round(2)
+```
+
+### Vice dimensions - z-transformed data
+
+```{r}
+
+df_lm_scaled <- df_scaled %>% 
+  pivot_longer(cols = vice1:vice9,names_to = "vice_dimension") %>% 
+  ungroup() %>% 
+  nest_by(vice_dimension) %>% 
+  mutate(lm_obj = list(vice_fit(data)),
+         R2 = (lm_obj %>% summary())$r.squared) %>% 
+  mutate(coefs = list(broom::tidy(lm_obj %>% summary)))  %>% 
+  unnest(coefs) %>% 
+  mutate(est = sprintf("%.2f%s",estimate,print_stars(p.value))) %>% 
+  select(vice_dimension:term,est) %>% 
+  filter(term != "(Intercept)") %>% 
+  pivot_wider(id_cols = vice_dimension:R2,names_from = term, values_from = est) %>% 
+  select(-data,-lm_obj)
+
+df_lm_scaled %>% 
+  knitr::kable(caption = "regression coefficients for videos with z-scored values",digits = 2)
+```

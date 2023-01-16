@@ -2,29 +2,30 @@ library(tidyverse)
 
 library(jsonlite)
 library(purrr)
-library(RcppCNPy)
 
-fs <- list.files(here::here("R/data/triplets/EXP1"),full.names = T, recursive = T) %>% 
+require("reticulate")
+
+source_python(here::here("R","import_pickle.py"))
+
+#
+
+# VICE --------------------------------------------------------------------
+
+fs <- list.files(here::here("R/data/triplets/VICE/EXP1"),full.names = T, recursive = T) %>% 
   as_tibble()
 
 fs_json <- fs %>% 
   filter(str_detect(value,".json")) %>% 
   filter(str_detect(value,"_ix")) %>% 
-  mutate(params = str_remove(value,"C:/git/video-triplets-experiment/R/data/triplets/EXP1/4variants_")) %>% 
+  mutate(params = str_remove(value,"D:/Documents/git/video-triplets-experiment/R/data/triplets/VICE/EXP1/4variants_")) %>% 
   mutate(params = str_remove(params,"/results.json")) %>% 
-  separate(params,into = c("lrate",NA,"lambda",NA,"ix"), sep = "_") %>% 
-  mutate(lrate = str_replace(lrate,"lrate","0.") %>% as.numeric(),
-         lambda = str_replace(lambda,"lmbda","0.") %>% as.numeric())
+  separate(params,into = c("mixture","eta","spike","slab","pi","ix",NA,NA,NA,NA,NA,NA,NA,NA), sep = "[_/]") %>% 
+  mutate(eta = str_replace(eta,"eta","0.") %>% as.numeric(),
+         spike = str_replace(spike,"spike","0.") %>% as.numeric(),
+         slab = recode(slab,"slab5"="0.5","slab1"="1","slab2"="2") %>% as.numeric(),
+         pi = str_replace(pi,"pi","0.") %>% as.numeric())
 
 
-fs_npy <- fs %>% 
-  filter(str_detect(value,".npy")) %>% 
-  filter(str_detect(value,"_ix")) %>% 
-  mutate(params = str_remove(value,"C:/git/video-triplets-experiment/R/data/triplets/EXP1/4variants_")) %>% 
-  mutate(params = str_remove(params,"/weights_sorted.npy")) %>% 
-  separate(params,into = c("lrate",NA,"lambda",NA,"ix"), sep = "_") %>% 
-  mutate(lrate = str_replace(lrate,"lrate","0.") %>% as.numeric(),
-         lambda = str_replace(lambda,"lmbda","0.") %>% as.numeric())
 
 df <- fs_json %>% 
   rowwise() %>% 
@@ -42,14 +43,15 @@ df_dim <- fs_npy %>%
 df <- df %>% 
   left_join(df_dim %>% select(-value), by = c("lrate", "lambda", "ix"))
 
-
+x <- np$load(here::here("R/data/triplets/VICE/EXP1/4variants_mixturegaussian_eta0005_spike125_slab1_pi4_ix2/30d/adam/gaussian/0.125/1.0/0.4/seed42/parameters.npz"))
 
 df
 df %>% 
   filter(train_accuracy>0) %>% 
-  ggplot(aes(x = lrate, y = val_accuracy)) + 
+  ggplot(aes(x = spike, y = val_accuracy)) + 
   stat_summary(fun.data="mean_cl_boot") +
-  facet_grid(~lambda)
+  facet_grid(eta~spike)+
+  ylim(0,1)
 
 df %>% 
   filter(train_accuracy>0) %>% 

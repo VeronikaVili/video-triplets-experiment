@@ -109,6 +109,33 @@ df_lm %>%
 df_lm$R2 %>% mean() %>% round(2)
 ```
 
+```{r}
+library(car)
+lm1 <- lm(vice1 ~ brightness+colourfulness+complexity+contrast+glossiness+directionality+`line elongation` + `patchiness/regularity` + `spatial scale` +  roughness, data = df)
+vif(lm1)
+summary(lm1)
+lmx1 <- lm(vice1 ~ brightness+complexity+glossiness+`line elongation` + `spatial scale` +  roughness, data = df)
+lmx1 %>% summary()
+
+lmx2 <- lm(vice1 ~ roughness, data = df)
+lmx2 %>% summary()
+anova(lmx1,lmx2)
+
+lm2 <- lm(vice2 ~ brightness+colourfulness+complexity+contrast+glossiness+directionality+`line elongation` + `patchiness/regularity` + `spatial scale` +  roughness, data = df)
+vif(lm1)
+summary(lm1)
+lm(vice2 ~ brightness+complexity+glossiness+`line elongation` + `spatial scale` +  roughness, data = df) %>% summary()
+
+lm(vice2 ~ complexity+glossiness+`spatial scale` +  roughness, data = df) %>% summary()
+
+
+lm(vice3 ~ brightness+complexity+glossiness+`line elongation` + `spatial scale` +  roughness, data = df) %>% summary()
+lm(vice4 ~ brightness+complexity+glossiness+`line elongation` + `spatial scale` +  roughness, data = df) %>% summary()
+
+
+
+```
+
 ### Vice dimensions - z-transformed data
 
 ```{r}

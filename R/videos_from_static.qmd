@@ -1,0 +1,345 @@
+---
+title: "Ratings correspondence"
+format:
+  html:
+    toc: true
+    code-fold: true
+    code-summary: "Show the code"
+editor: visual
+---
+
+```{r setup}
+knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(warning = F,message = F)
+```
+
+## Load data
+
+First, we are loading rating data from video, static1 and static2.
+
+```{r}
+library(tidyverse); theme_set(theme_minimal(16))
+library(here)
+library(purrr)
+
+raw <- read_table2(here("R/data/ratings/EXP1_rating__10dims_all.txt"), col_names = F) %>% 
+  select(-X31) %>% 
+  mutate(dimension = rep(1:10, each = 45)) 
+df_exp1_video <- raw %>% 
+  pivot_longer(cols = -dimension, names_to = "material_id", values_to = "rating") %>% 
+  arrange(material_id) %>% 
+  mutate(rater_id = rep(1:45, times = 300)) %>% 
+  group_by(rater_id) %>% 
+  mutate(rating_scaled = (rating - mean(rating))/sd(rating) )
+
+rating_names <- tibble(dimension = 1:10, dim_name = c("brightness","glossiness","colourfulness","directionality","complexity","contrast","roughness","patchiness/regularity","line elongation","spatial scale"))
+df_exp1 <- df_exp1_video %>% left_join(rating_names)
+
+
+raw <- read_table2(here("R/data/ratings/EXP1_rating_st1_10dims_all.txt"), col_names = F) %>% 
+  select(-X31) %>% 
+  mutate(dimension = rep(1:10, each = 22)) 
+df_exp1_st1 <- raw %>% 
+  pivot_longer(cols = -dimension, names_to = "material_id", values_to = "rating") %>% 
+  arrange(material_id) %>% 
+  mutate(rater_id = rep(1:22, times = 300)) %>% 
+  group_by(rater_id) %>% 
+  mutate(rating_scaled = (rating - mean(rating))/sd(rating) )
+
+rating_names <- tibble(dimension = 1:10, dim_name = c("brightness","glossiness","colourfulness","directionality","complexity","contrast","roughness","patchiness/regularity","line elongation","spatial scale"))
+
+df_exp1_st1 <- df_exp1_st1 %>% left_join(rating_names)
+
+raw <- read_table2(here("R/data/ratings/EXP1_rating_st2_10dims_all.txt"), col_names = F) %>% 
+  select(-X31) %>% 
+  mutate(dimension = rep(1:10, each = 20)) 
+df_exp1_st2<- raw %>% 
+  pivot_longer(cols = -dimension, names_to = "material_id", values_to = "rating") %>% 
+  arrange(material_id) %>% 
+  mutate(rater_id = rep(1:20, times = 300)) %>% 
+  group_by(rater_id) %>% 
+  mutate(rating_scaled = (rating - mean(rating))/sd(rating) )
+
+rating_names <- tibble(dimension = 1:10, dim_name = c("brightness","glossiness","colourfulness","directionality","complexity","contrast","roughness","patchiness/regularity","line elongation","spatial scale"))
+
+df_exp1_st2 <- df_exp1_st2 %>% left_join(rating_names)
+
+df <- df_exp1 %>% 
+  group_by(material_id, dim_name) %>% 
+  summarize(rating_video = mean(rating),
+            z_rating_video = mean(rating_scaled),.groups = "drop") %>% 
+  left_join(df_exp1_st1 %>% 
+  group_by(material_id, dim_name) %>% 
+  summarize(rating_st1 = mean(rating),
+            z_rating_st1 = mean(rating_scaled),.groups = "drop"), by = c("material_id", "dim_name")) %>% 
+  left_join(df_exp1_st2 %>% 
+  group_by(material_id, dim_name) %>% 
+  summarize(rating_st2 = mean(rating),
+            z_rating_st2 = mean(rating_scaled),.groups = "drop"), by = c("material_id", "dim_name")) 
+  
+```
+
+Let's explore correlations between ratings
+
+```{r}
+
+df %>% select(starts_with("z_")) %>% cor() %>% knitr::kable(caption = "Correlations were high for scaled ratings",digits = 2)
+
+df %>% select(starts_with("rating")) %>% cor()%>% knitr::kable(caption = "Correlations were high for raw ratings as well",digits = 2)
+
+```
+
+And for individual dimensions. It seems that colourfulness is better predicted by off-specluar highlight, while glossiness by specular highlight
+
+```{r }
+df %>% 
+  group_by(dim_name) %>% 
+  summarize(c_st1 = cor(rating_video,rating_st1),
+            c_st2 = cor(rating_video,rating_st2)) %>% 
+  knitr::kable(digits = 2)
+```
+
+# Predict dynamic based on static value
+
+## using of average values of videos
+
+```{r}
+stats_video <- read_table2(here("R/data/ratings/stats_video.txt"), col_names = F)
+
+colnames(stats_video) <- c("Maximum","Minimum","Mean","Variance","Skewness","Kurtosis","Directionality","Low frequency","Middle frequency","High frequency","Mean of chroma")
+```
+
+### PCA analysis
+
+```{r}
+stats_video %>% psych::fa.parallel(fa="pc",fm = "ml")
+
+```
+
+It seems that 2 PC are enough, I have functioning code for 4, so I am using 4 :-)
+
+```{r}
+#pca_video2 <- stats_video %>% psych::pca(nfactors = 2,rotate = "varimax")
+pca_video <- stats_video %>% psych::pca(nfactors = 4,rotate = "varimax")
+cum_perc_accounted <- pca_video$Vaccounted %>% enframe() %>% filter(name == "Cumulative Var") %>% pull(2)
+```
+
+4 factor solution explains `r (100*cum_perc_accounted[4]) %>% round()`% variance
+
+```{r}
+#print(pca_video2$loadings, digits = 3, cutoff = 0.3)
+print(pca_video$loadings, digits = 3, cutoff = 0.3)
+```
+
+```{r}
+
+df <- df %>% 
+  left_join(pca_video$scores %>% 
+  as_tibble() %>% 
+   mutate(material_id = paste0("X",1:30),.before = everything()), by = "material_id")
+
+RC1 <- df %>% 
+  split(df$dim_name) %>% 
+  map(\(df) lm(rating_video ~ rating_st1+RC1, data = df)) %>% 
+  map(summary) %>%
+  map_dbl("r.squared")
+
+RC2 <- df %>% 
+  split(df$dim_name) %>% 
+  map(\(df) lm(rating_video ~ rating_st1+RC2, data = df)) %>% 
+  map(summary) %>%
+  map_dbl("r.squared")
+
+RC3 <- df %>% 
+  split(df$dim_name) %>% 
+  map(\(df) lm(rating_video ~ rating_st1+RC3, data = df)) %>% 
+  map(summary) %>%
+  map_dbl("r.squared")
+
+RC4 <- df %>% 
+  split(df$dim_name) %>% 
+  map(\(df) lm(rating_video ~ rating_st1+RC4, data = df)) %>% 
+  map(summary) %>%
+  map_dbl("r.squared")
+
+RC1_RC2 <- df %>% 
+  split(df$dim_name) %>% 
+  map(\(df) lm(rating_video ~ rating_st1+RC1+RC2, data = df)) %>% 
+  map(summary) %>%
+  map_dbl("r.squared")
+
+RC1_RC3 <- df %>% 
+  split(df$dim_name) %>% 
+  map(\(df) lm(rating_video ~ rating_st1+RC1+RC3, data = df)) %>% 
+  map(summary) %>%
+  map_dbl("r.squared")
+
+RC1_RC4 <- df %>% 
+  split(df$dim_name) %>% 
+  map(\(df) lm(rating_video ~ rating_st1+RC1+RC4, data = df)) %>% 
+  map(summary) %>%
+  map_dbl("r.squared")
+
+RC2_RC3 <- df %>% 
+  split(df$dim_name) %>% 
+  map(\(df) lm(rating_video ~ rating_st1+RC2+RC3, data = df)) %>% 
+  map(summary) %>%
+  map_dbl("r.squared")
+
+RC2_RC4 <- df %>% 
+  split(df$dim_name) %>% 
+  map(\(df) lm(rating_video ~ rating_st1+RC2+RC4, data = df)) %>% 
+  map(summary) %>%
+  map_dbl("r.squared")
+
+RC3_RC4 <- df %>% 
+  split(df$dim_name) %>% 
+  map(\(df) lm(rating_video ~ rating_st1+RC2+RC4, data = df)) %>% 
+  map(summary) %>%
+  map_dbl("r.squared")
+
+RC1_RC3_RC4 <- df %>% 
+  split(df$dim_name) %>% 
+  map(\(df) lm(rating_video ~ rating_st1+RC1+RC3+RC4, data = df)) %>% 
+  map(summary) %>%
+  map_dbl("r.squared")
+
+RC1_RC2_RC4 <- df %>% 
+  split(df$dim_name) %>% 
+  map(\(df) lm(rating_video ~ rating_st1+RC1+RC2+RC4, data = df)) %>% 
+  map(summary) %>%
+  map_dbl("r.squared")
+
+RC2_RC3_RC4 <- df %>% 
+  split(df$dim_name) %>% 
+  map(\(df) lm(rating_video ~ rating_st1+RC2+RC3+RC4, data = df)) %>% 
+  map(summary) %>%
+  map_dbl("r.squared")
+
+RC1_RC2_RC3_RC4 <- df %>% 
+  split(df$dim_name) %>% 
+  map(\(df) lm(rating_video ~ rating_st1+RC1+RC2+RC3+RC4, data = df)) %>% 
+  map(summary) %>%
+  map_dbl("r.squared")
+
+tibble(dimension = df$dim_name %>% unique(),
+      RC1 = RC1,
+       RC2 = RC2,
+       RC3 = RC3,
+       RC4 = RC4,
+       RC1_RC2 = RC1_RC2,
+       RC1_RC3 = RC1_RC3,
+       RC1_RC4 = RC1_RC4,
+       RC2_RC3 = RC2_RC3,
+       RC2_RC4 = RC2_RC4,
+       RC3_RC4 = RC3_RC4,
+       RC1_RC3_RC4 = RC1_RC3_RC4,
+       RC1_RC2_RC4 = RC1_RC2_RC4,
+       RC2_RC3_RC4 = RC2_RC3_RC4,
+       RC1_RC2_RC3_RC4 = RC1_RC2_RC3_RC4) %>% 
+  knitr::kable(digits = 2, caption = "R2 for models predicting video based on on static off-specular + added PCA component/s")
+```
+
+
+```{r}
+RC1 <- df %>% 
+  split(df$dim_name) %>% 
+  map(\(df) lm(rating_video ~ rating_st2+RC1, data = df)) %>% 
+  map(summary) %>%
+  map_dbl("r.squared")
+
+RC2 <- df %>% 
+  split(df$dim_name) %>% 
+  map(\(df) lm(rating_video ~ rating_st2+RC2, data = df)) %>% 
+  map(summary) %>%
+  map_dbl("r.squared")
+
+RC3 <- df %>% 
+  split(df$dim_name) %>% 
+  map(\(df) lm(rating_video ~ rating_st2+RC3, data = df)) %>% 
+  map(summary) %>%
+  map_dbl("r.squared")
+
+RC4 <- df %>% 
+  split(df$dim_name) %>% 
+  map(\(df) lm(rating_video ~ rating_st2+RC4, data = df)) %>% 
+  map(summary) %>%
+  map_dbl("r.squared")
+
+RC1_RC2 <- df %>% 
+  split(df$dim_name) %>% 
+  map(\(df) lm(rating_video ~ rating_st2+RC1+RC2, data = df)) %>% 
+  map(summary) %>%
+  map_dbl("r.squared")
+
+RC1_RC3 <- df %>% 
+  split(df$dim_name) %>% 
+  map(\(df) lm(rating_video ~ rating_st2+RC1+RC3, data = df)) %>% 
+  map(summary) %>%
+  map_dbl("r.squared")
+
+RC1_RC4 <- df %>% 
+  split(df$dim_name) %>% 
+  map(\(df) lm(rating_video ~ rating_st2+RC1+RC4, data = df)) %>% 
+  map(summary) %>%
+  map_dbl("r.squared")
+
+RC2_RC3 <- df %>% 
+  split(df$dim_name) %>% 
+  map(\(df) lm(rating_video ~ rating_st2+RC2+RC3, data = df)) %>% 
+  map(summary) %>%
+  map_dbl("r.squared")
+
+RC2_RC4 <- df %>% 
+  split(df$dim_name) %>% 
+  map(\(df) lm(rating_video ~ rating_st2+RC2+RC4, data = df)) %>% 
+  map(summary) %>%
+  map_dbl("r.squared")
+
+RC3_RC4 <- df %>% 
+  split(df$dim_name) %>% 
+  map(\(df) lm(rating_video ~ rating_st2+RC2+RC4, data = df)) %>% 
+  map(summary) %>%
+  map_dbl("r.squared")
+
+RC1_RC3_RC4 <- df %>% 
+  split(df$dim_name) %>% 
+  map(\(df) lm(rating_video ~ rating_st2+RC1+RC3+RC4, data = df)) %>% 
+  map(summary) %>%
+  map_dbl("r.squared")
+
+RC1_RC2_RC4 <- df %>% 
+  split(df$dim_name) %>% 
+  map(\(df) lm(rating_video ~ rating_st2+RC1+RC2+RC4, data = df)) %>% 
+  map(summary) %>%
+  map_dbl("r.squared")
+
+RC2_RC3_RC4 <- df %>% 
+  split(df$dim_name) %>% 
+  map(\(df) lm(rating_video ~ rating_st2+RC2+RC3+RC4, data = df)) %>% 
+  map(summary) %>%
+  map_dbl("r.squared")
+
+RC1_RC2_RC3_RC4 <- df %>% 
+  split(df$dim_name) %>% 
+  map(\(df) lm(rating_video ~ rating_st2+RC1+RC2+RC3+RC4, data = df)) %>% 
+  map(summary) %>%
+  map_dbl("r.squared")
+
+tibble(dimension = df$dim_name %>% unique(),
+      RC1 = RC1,
+       RC2 = RC2,
+       RC3 = RC3,
+       RC4 = RC4,
+       RC1_RC2 = RC1_RC2,
+       RC1_RC3 = RC1_RC3,
+       RC1_RC4 = RC1_RC4,
+       RC2_RC3 = RC2_RC3,
+       RC2_RC4 = RC2_RC4,
+       RC3_RC4 = RC3_RC4,
+       RC1_RC3_RC4 = RC1_RC3_RC4,
+       RC1_RC2_RC4 = RC1_RC2_RC4,
+       RC2_RC3_RC4 = RC2_RC3_RC4,
+       RC1_RC2_RC3_RC4 = RC1_RC2_RC3_RC4) %>% 
+  knitr::kable(digits = 2, caption = "R2 for models predicting video based on static specular + added PCA component/s")
+```

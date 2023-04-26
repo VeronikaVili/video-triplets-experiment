@@ -107,12 +107,19 @@ df %>%
 stats_video <- read_table2(here("R/data/ratings/stats_video.txt"), col_names = F)
 
 colnames(stats_video) <- c("Maximum","Minimum","Mean","Variance","Skewness","Kurtosis","Directionality","Low frequency","Middle frequency","High frequency","Mean of chroma")
+
+stats_video_over_time <- read_table2(here("R/data/ratings/video_statistics_std_dev.txt"), col_names = F)
+
+colnames(stats_video_over_time) <- c("material_id",paste0("sd_", c("Maximum","Minimum","Mean","Variance","Skewness","Kurtosis","Directionality","Low frequency","Middle frequency","High frequency","Mean of chroma")))
+
 ```
 
 ### PCA analysis
 
 ```{r}
 stats_video %>% psych::fa.parallel(fa="pc",fm = "ml")
+
+stats_video_over_time %>% select(-material_id) %>% psych::fa.parallel(fa="pc",fm = "ml")
 
 ```
 
@@ -122,6 +129,10 @@ It seems that 2 PC are enough, I have functioning code for 4, so I am using 4 :-
 #pca_video2 <- stats_video %>% psych::pca(nfactors = 2,rotate = "varimax")
 pca_video <- stats_video %>% psych::pca(nfactors = 4,rotate = "varimax")
 cum_perc_accounted <- pca_video$Vaccounted %>% enframe() %>% filter(name == "Cumulative Var") %>% pull(2)
+
+pca_video_over_time <- stats_video_over_time %>% psych::pca(nfactors = 4,rotate = "varimax")
+cum_perc_accounted <- pca_video$Vaccounted %>% enframe() %>% filter(name == "Cumulative Var") %>% pull(2)
+
 ```
 
 4 factor solution explains `r (100*cum_perc_accounted[4]) %>% round()`% variance
@@ -132,9 +143,12 @@ print(pca_video$loadings, digits = 3, cutoff = 0.3)
 ```
 
 ```{r}
-
+colnames(pca_video_over_time$scores) <- paste0(colnames(pca_video_over_time$scores),"_sd")
 df <- df %>% 
   left_join(pca_video$scores %>% 
+  as_tibble() %>% 
+   mutate(material_id = paste0("X",1:30),.before = everything()), by = "material_id") %>% 
+  left_join(pca_video_over_time$scores %>% 
   as_tibble() %>% 
    mutate(material_id = paste0("X",1:30),.before = everything()), by = "material_id")
 
@@ -222,22 +236,106 @@ RC1_RC2_RC3_RC4 <- df %>%
   map(summary) %>%
   map_dbl("r.squared")
 
+RC1_sd <- df %>% 
+  split(df$dim_name) %>% 
+  map(\(df) lm(rating_video ~ rating_st1+RC1_sd, data = df)) %>% 
+  map(summary) %>%
+  map_dbl("r.squared")
+
+RC2_sd <- df %>% 
+  split(df$dim_name) %>% 
+  map(\(df) lm(rating_video ~ rating_st1+RC2_sd, data = df)) %>% 
+  map(summary) %>%
+  map_dbl("r.squared")
+
+RC3_sd <- df %>% 
+  split(df$dim_name) %>% 
+  map(\(df) lm(rating_video ~ rating_st1+RC3_sd, data = df)) %>% 
+  map(summary) %>%
+  map_dbl("r.squared")
+
+RC4_sd <- df %>% 
+  split(df$dim_name) %>% 
+  map(\(df) lm(rating_video ~ rating_st1+RC4_sd, data = df)) %>% 
+  map(summary) %>%
+  map_dbl("r.squared")
+
+RC1_sd_RC2_sd <- df %>% 
+  split(df$dim_name) %>% 
+  map(\(df) lm(rating_video ~ rating_st1+RC1_sd+RC2_sd, data = df)) %>% 
+  map(summary) %>%
+  map_dbl("r.squared")
+
+RC1_sd_RC3_sd <- df %>% 
+  split(df$dim_name) %>% 
+  map(\(df) lm(rating_video ~ rating_st1+RC1_sd+RC3_sd, data = df)) %>% 
+  map(summary) %>%
+  map_dbl("r.squared")
+
+RC1_sd_RC4_sd <- df %>% 
+  split(df$dim_name) %>% 
+  map(\(df) lm(rating_video ~ rating_st1+RC1_sd+RC4_sd, data = df)) %>% 
+  map(summary) %>%
+  map_dbl("r.squared")
+
+RC2_sd_RC3_sd <- df %>% 
+  split(df$dim_name) %>% 
+  map(\(df) lm(rating_video ~ rating_st1+RC2_sd+RC3_sd, data = df)) %>% 
+  map(summary) %>%
+  map_dbl("r.squared")
+
+RC2_sd_RC4_sd <- df %>% 
+  split(df$dim_name) %>% 
+  map(\(df) lm(rating_video ~ rating_st1+RC2_sd+RC4_sd, data = df)) %>% 
+  map(summary) %>%
+  map_dbl("r.squared")
+
+RC3_sd_RC4_sd <- df %>% 
+  split(df$dim_name) %>% 
+  map(\(df) lm(rating_video ~ rating_st1+RC2_sd+RC4_sd, data = df)) %>% 
+  map(summary) %>%
+  map_dbl("r.squared")
+
+RC1_sd_RC3_sd_RC4_sd <- df %>% 
+  split(df$dim_name) %>% 
+  map(\(df) lm(rating_video ~ rating_st1+RC1_sd+RC3_sd+RC4_sd, data = df)) %>% 
+  map(summary) %>%
+  map_dbl("r.squared")
+
+RC1_sd_RC2_sd_RC4_sd <- df %>% 
+  split(df$dim_name) %>% 
+  map(\(df) lm(rating_video ~ rating_st1+RC1_sd+RC2_sd+RC4_sd, data = df)) %>% 
+  map(summary) %>%
+  map_dbl("r.squared")
+
+RC2_sd_RC3_sd_RC4_sd <- df %>% 
+  split(df$dim_name) %>% 
+  map(\(df) lm(rating_video ~ rating_st1+RC2_sd+RC3_sd+RC4_sd, data = df)) %>% 
+  map(summary) %>%
+  map_dbl("r.squared")
+
+RC1_sd_RC2_sd_RC3_sd_RC4_sd <- df %>% 
+  split(df$dim_name) %>% 
+  map(\(df) lm(rating_video ~ rating_st1+RC1_sd+RC2_sd+RC3_sd+RC4_sd, data = df)) %>% 
+  map(summary) %>%
+  map_dbl("r.squared")
+
 tibble(dimension = df$dim_name %>% unique(),
-      RC1 = RC1,
-       RC2 = RC2,
-       RC3 = RC3,
-       RC4 = RC4,
-       RC1_RC2 = RC1_RC2,
-       RC1_RC3 = RC1_RC3,
-       RC1_RC4 = RC1_RC4,
-       RC2_RC3 = RC2_RC3,
-       RC2_RC4 = RC2_RC4,
-       RC3_RC4 = RC3_RC4,
-       RC1_RC3_RC4 = RC1_RC3_RC4,
-       RC1_RC2_RC4 = RC1_RC2_RC4,
-       RC2_RC3_RC4 = RC2_RC3_RC4,
-       RC1_RC2_RC3_RC4 = RC1_RC2_RC3_RC4) %>% 
-  knitr::kable(digits = 2, caption = "R2 for models predicting video based on on static off-specular + added PCA component/s")
+      RC1_sd = RC1_sd,
+       RC2_sd = RC2_sd,
+       RC3_sd = RC3_sd,
+       RC4_sd = RC4_sd,
+       RC1_sd_RC2_sd = RC1_sd_RC2_sd,
+       RC1_sd_RC3_sd = RC1_sd_RC3_sd,
+       RC1_sd_RC4_sd = RC1_sd_RC4_sd,
+       RC2_sd_RC3_sd = RC2_sd_RC3_sd,
+       RC2_sd_RC4_sd = RC2_sd_RC4_sd,
+       RC3_sd_RC4_sd = RC3_sd_RC4_sd,
+       RC1_sd_RC3_sd_RC4_sd = RC1_sd_RC3_sd_RC4_sd,
+       RC1_sd_RC2_sd_RC4_sd = RC1_sd_RC2_sd_RC4_sd,
+       RC2_sd_RC3_sd_RC4_sd = RC2_sd_RC3_sd_RC4_sd,
+       RC1_sd_RC2_sd_RC3_sd_RC4_sd = RC1_sd_RC2_sd_RC3_sd_RC4_sd) %>% 
+  knitr::kable(digits = 2, caption = "R2 for models predicting video based on on static off-specular + added PCA component/s from statistics over time")
 ```
 
 
